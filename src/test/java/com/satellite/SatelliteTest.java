@@ -1,8 +1,19 @@
 package com.satellite;
 
+import com.satellite.annotation.Id;
+
 import static org.junit.Assert.*;
 
 public class SatelliteTest {
+
+    private class User {
+        @Id(name="ID")
+        public int id;
+        public String name;
+        public int age;
+
+    }
+
     @org.junit.Before
     public void setUp() throws Exception {
     }
