@@ -13,11 +13,6 @@ Implement of CRUD
 * Delete - by given Object
 * Delete - by given id
 
-Implement of Linker in DB
-* Push - all update or create Object
-* FetchAll - all database Object
-* FetchWithQuery - fetch by query in param
-
 ### Annotations
 Implement our own annotation or java annotation
 
@@ -35,3 +30,8 @@ public class User {
 ### Linker
 Implement of Linker
 Communicate with the Database
+
+Implement of Linker in DB
+* Push - all update or create Object
+* FetchAll - all database Object
+* FetchWithQuery - fetch by query in param
