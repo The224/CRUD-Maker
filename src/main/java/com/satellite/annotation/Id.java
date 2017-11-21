@@ -1,4 +1,4 @@
-package com.crudmaker.annotation;
+package com.satellite.annotation;
 
 public @interface Id {
     String name();

@@ -1,8 +1,8 @@
-package com.crudmaker;
+package com.satellite;
 
 import java.util.List;
 
-public class CRUDMaker<T> {
+public class Satellite<T> {
 
     private List<T> pendingList;
 
