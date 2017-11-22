@@ -2,9 +2,13 @@ package com.satellite;
 
 import java.util.List;
 
-public class Satellite<T> {
+public class Satellite<T> extends Linker {
 
     private List<T> pendingList;
+
+    public Satellite(String hostIp, String hostName, String hostPassword) {
+        super(hostIp, hostName, hostPassword);
+    }
 
     public void create(T t) {
         pendingList.add(t);
@@ -21,15 +25,5 @@ public class Satellite<T> {
     public void delete(T t) {
         pendingList.remove(t);
     }
-
-    public void push() {
-
-
-
-    }
-
-
-
-
 
 }
