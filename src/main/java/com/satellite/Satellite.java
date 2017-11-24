@@ -7,7 +7,9 @@ import java.util.Arrays;
 import java.util.List;
 
 public class Satellite<T> {
-
+    // Liste des objects deja dans la base de donnees
+    private List<T> inDbList;
+    // Liste des objects avant d'etre envoyer dans la base de donnees
     private List<T> pendingList;
     private Linker linker;
 
