@@ -17,8 +17,11 @@ public class Satellite<T> {
 
     }
 
-    public void create(T t) {
+    public void insert(T t) {
         pendingList.add(t);
+    }
+
+    public void insertNow(T t) {// Bypass le pending et va directement dans la db
     }
 
     public T read(int i) {
@@ -26,12 +29,32 @@ public class Satellite<T> {
     }
 
     public void update(int t) {
+    }
 
+    public void updateNow(int t) {// Bypass le pending et va directement dans la db
     }
 
     public void delete(T t) {
         pendingList.remove(t);
     }
+
+    public void deleteNow(T t) {// Bypass le pending et va directement dans la db
+    }
+
+    // Envoie toute les modifications au serveur
+    public void push() {
+
+    }
+
+
+
+
+
+
+
+
+
+
 
     public void printClassInformation(T t) {
         try {
