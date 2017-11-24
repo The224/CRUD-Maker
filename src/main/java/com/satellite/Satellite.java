@@ -1,6 +1,6 @@
 package com.satellite;
 
-import com.satellite.annotation.Id;
+import com.example.UserExample;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
@@ -36,16 +36,18 @@ public class Satellite<T> extends Linker {
 
     public void printClassInformation(T t) {
         try {
-            Class loadedClass = t.getClass();
-            System.out.println("Class " + loadedClass + " found successfully!");
+            UserExample test = new UserExample("",2);
 
-            Field[] fields = t.getClass().getDeclaredFields();
-            System.out.println(Arrays.toString(fields));
+            for(Field field : t.getClass().getDeclaredFields()){
+                Class type = field.getType();
+                String name = field.getName();
+                Annotation[] annotations = field.getDeclaredAnnotations();
 
-            System.out.println(t.getClass().isAnnotationPresent(Id.class));
+                System.out.println(type);
+                System.out.println(name);
 
-            Annotation[] annotations = t.getClass().getDeclaredAnnotations();
-            System.out.println(Arrays.toString(annotations));
+                System.out.println(Arrays.toString(annotations));
+            }
 
         } catch (Exception e) {
             e.printStackTrace();

@@ -11,9 +11,6 @@ public class Main {
 
 
         service.printClassInformation();
-
-
-
-
+        
     }
 }
