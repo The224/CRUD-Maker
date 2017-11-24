@@ -10,20 +10,7 @@ public class Main {
         service.safeAddUser("Alec", 78);
 
 
-        service.saveCreateUserOnDB();
-
-
-
-
-
-
-
-
-
-
-
-
-
+        service.printClassInformation();
 
 
 

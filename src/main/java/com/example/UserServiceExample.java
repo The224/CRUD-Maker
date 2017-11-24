@@ -6,6 +6,9 @@ public class UserServiceExample {
 
     private Satellite<UserExample> satellite;
 
+    public UserServiceExample() {
+        satellite = new Satellite<UserExample>("","","");
+    }
 
     public void safeAddUser(String name, int age) {
         try {
@@ -27,8 +30,9 @@ public class UserServiceExample {
         satellite.push();
     }
 
-
-
+    public void printClassInformation() {
+        satellite.printClassInformation(satellite.read(1));
+    }
 
 
 

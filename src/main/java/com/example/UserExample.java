@@ -2,11 +2,15 @@ package com.example;
 
 import com.satellite.annotation.Id;
 
+import javax.persistence.Column;
+
 public class UserExample {
 
     @Id(name="PK_ID")
     private int id;
+    @Column(name = "NAME")
     private String name;
+    @Column(name = "AGE")
     private int age;
 
     public UserExample(String name, int age) {
