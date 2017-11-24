@@ -1,19 +1,18 @@
 package com.satellite;
 
-import com.example.UserExample;
-
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class Satellite<T> extends Linker {
+public class Satellite<T> {
 
     private List<T> pendingList;
+    private Linker linker;
 
     public Satellite(String hostIp, String hostName, String hostPassword) {
-        super(hostIp, hostName, hostPassword);
+        linker = new Linker(hostIp, hostName, hostPassword);
         pendingList = new ArrayList<T>();
 
     }
@@ -36,8 +35,6 @@ public class Satellite<T> extends Linker {
 
     public void printClassInformation(T t) {
         try {
-            UserExample test = new UserExample("",2);
-
             for(Field field : t.getClass().getDeclaredFields()){
                 Class type = field.getType();
                 String name = field.getName();
@@ -48,10 +45,8 @@ public class Satellite<T> extends Linker {
 
                 System.out.println(Arrays.toString(annotations));
             }
-
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
-
 }

@@ -1,16 +1,18 @@
 package com.example;
 
+import com.satellite.Satellite;
+
 public class Main {
     public static void main(String... args) {
-        UserServiceExample service = new UserServiceExample();
+        Satellite<UserExample> satellite = new Satellite<UserExample>("","","");
 
-        service.safeAddUser("Gabriel", 90);
-        service.safeAddUser("Karla", 34);
-        service.safeAddUser("Tyrion", 56);
-        service.safeAddUser("Alec", 78);
+        satellite.create(new UserExample("Gabriel", 90));
+        satellite.create(new UserExample("Karla", 34));
+        satellite.create(new UserExample("Tyrion", 56));
+        satellite.create(new UserExample("Alec", 78));
 
+        UserExample user = new UserExample("TestName", 100);
 
-        service.printClassInformation();
-        
+        satellite.printClassInformation(user);
     }
 }
