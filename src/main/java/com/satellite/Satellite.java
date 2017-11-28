@@ -27,8 +27,8 @@ public class Satellite<T> {
     public boolean insert(T obj) {
         for (T t : pendingList)
             if (getIdValue(t).equals(getIdValue(obj))) {
-                System.out.println("Deja present !");
-                return false; /// Si un obj se retrouve avec le meme id
+                System.out.println("Un objet avec le meme id existe deja !");
+                return false;
             }
         pendingList.add(obj);
         return true;
@@ -65,7 +65,7 @@ public class Satellite<T> {
     }
 
     public boolean update(@NotNull Object id, T t) {
-        remove(id);
+        remove(id); // The lazy way !
         return insert(t);
     }
 
