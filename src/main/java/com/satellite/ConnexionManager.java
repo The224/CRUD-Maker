@@ -1,5 +1,6 @@
 package com.satellite;
 
+import com.jcraft.jsch.JSch;
 import javax.jms.Session;
 import javax.security.auth.login.Configuration;
 import java.sql.Connection;
@@ -57,11 +58,11 @@ public class ConnexionManager {
     public static void configureSSH(Session session) {
         java.util.Properties configurations = new java.util.Properties();
         configurations.put("StrictHostKeyChecking", "no");
-        session.setConfig(configurations);
+       // session.setConfig(configurations);
     }
 
     public static void closeSSHSession(){
-        sshSession.disconnect();
+        //sshSession.disconnect();
     }
 
     public void push() {
