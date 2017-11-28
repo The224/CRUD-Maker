@@ -1,8 +1,10 @@
 package com.satellite;
 
 import com.jcraft.jsch.JSch;
-import javax.jms.Session;
-import javax.security.auth.login.Configuration;
+
+import com.jcraft.jsch.Session;
+
+
 import java.sql.Connection;
 import java.sql.DriverManager;
 
@@ -13,6 +15,14 @@ public class ConnexionManager {
     private String hostPassword;
     private Integer hostPort;
 
+    private String ssh_username;
+    private String ssh_hostname;
+    private int ssh_localport;
+    private String ssh_localadress;
+    private int ssh_remoteport;
+    private String ssh_pathkey;
+
+
     public ConnexionManager(String hostIp, String hostName, String hostPassword) {
         this.hostIp = hostIp;
         this.hostName = hostName;
@@ -20,9 +30,9 @@ public class ConnexionManager {
         this.hostPort = hostPort;
     }
 
-    private static Session sshSession;
+    private com.jcraft.jsch.Session sshSession;
 
-    public static Connection connectJDBC(String url, String user, String password) {
+    public Connection connectJDBC(String url, String user, String password) {
 
         openSSHSession();
         Connection connection = null;
@@ -37,16 +47,16 @@ public class ConnexionManager {
         return connection;
     }
 
-    public static void openSSHSession() {
+    public void openSSHSession() {
 
         try {
             JSch jsch = new JSch();
-            sshSession = jsch.getSession(Configuration.SSH_USERNAME, Configuration.SSH_HOSTNAME, 22);
-            jsch.addIdentity(Configuration.SSH_PATH_KEY);
+            sshSession = jsch.getSession(ssh_username, ssh_hostname, 22);
+            jsch.addIdentity(ssh_pathkey);
 
             configureSSH(sshSession);
             sshSession.connect();
-            sshSession.setPortForwardingL(Configuration.SSH_LOCALPORT, Configuration.SSH_LOCALADRESS, Configuration.SSH_REMOTEPORT);
+            sshSession.setPortForwardingL(ssh_localport, ssh_localadress, ssh_remoteport);
             System.out.println("Session créée");
         } catch (Exception e) {
             System.out.println("Problème de création de session: ");
@@ -55,14 +65,15 @@ public class ConnexionManager {
 
     }
 
-    public static void configureSSH(Session session) {
+    public void configureSSH(com.jcraft.jsch.Session session) {
         java.util.Properties configurations = new java.util.Properties();
         configurations.put("StrictHostKeyChecking", "no");
        // session.setConfig(configurations);
     }
 
-    public static void closeSSHSession(){
-        //sshSession.disconnect();
+
+    public void closeSSHSession(){
+        sshSession.disconnect();
     }
 
     public void push() {
