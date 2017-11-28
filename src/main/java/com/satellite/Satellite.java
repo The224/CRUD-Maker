@@ -24,8 +24,14 @@ public class Satellite<T> {
         this.beanClass = beanClass;
     }
 
-    public void insert(T t) {
-        pendingList.add(t);
+    public boolean insert(T obj) {
+        for (T t : pendingList)
+            if (getIdValue(t).equals(getIdValue(obj))) {
+                System.out.println("Deja present !");
+                return false; /// Si un obj se retrouve avec le meme id
+            }
+        pendingList.add(obj);
+        return true;
     }
 
     public T findById(@NotNull Object id) {
@@ -57,6 +63,13 @@ public class Satellite<T> {
         }
         return false;
     }
+
+    public boolean update(@NotNull Object id, T t) {
+        remove(id);
+        return insert(t);
+    }
+
+
 
 
 
