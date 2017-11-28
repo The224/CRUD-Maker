@@ -61,24 +61,26 @@ public class Satellite<T> {
 
 
     /**
+     * Recois toutes les informations de la BD
+     */
+    public void fetchAll() {
+        // TODO : recois de la BD
+    }
+
+    /**
+     * Recois les informations specifier dans la query
+     */
+    public void fetchByQuery(String query) {
+        // TODO : recois de la BD
+    }
+
+    /**
      * Envoie les modifications de pendingList dans fetchList et la BD
      */
     public void push() {
         fetchList.addAll(pendingList);
         // TODO : envoyer sur la BD
     }
-
-
-
-
-
-
-
-
-
-
-
-
 
     private Object getIdValue(T t) {
         try {
