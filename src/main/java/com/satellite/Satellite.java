@@ -48,16 +48,6 @@ public class Satellite<T> {
 
     }
 
-
-
-
-
-
-
-
-
-
-
     public void printClassInformation(T t) {
         try {
             for(Field field : t.getClass().getDeclaredFields()){
