@@ -7,6 +7,7 @@ import com.sun.istack.internal.NotNull;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -43,6 +44,9 @@ public class Satellite<T> {
         }
     }
 
+    public void closeConnection() throws SQLException{
+        connectionManager.close();
+    }
 
     public T findById(@NotNull Object id) {
         for (T t : fetchList) {
