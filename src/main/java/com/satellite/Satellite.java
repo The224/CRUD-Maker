@@ -1,7 +1,8 @@
 package com.satellite;
 
 import com.satellite.annotation.Id;
-import com.satellite.exception.NoIdAnnotation;
+import com.satellite.exception.ConnectionFailedException;
+import com.satellite.exception.NoIdAnnotationException;
 import com.sun.istack.internal.NotNull;
 
 import java.lang.annotation.Annotation;
@@ -18,7 +19,9 @@ public class Satellite<T> {
     // Class du generic
     private Class beanClass;
 
-    public Satellite(Class beanClass) throws NoIdAnnotation{
+    private ConnectionManager connectionManager;
+
+    public Satellite(Class beanClass) throws NoIdAnnotationException {
         pendingList = new ArrayList<T>();
         fetchList = new ArrayList<T>();
         this.beanClass = beanClass;
@@ -34,9 +37,10 @@ public class Satellite<T> {
         return true;
     }
 
-    public void connect(String url, String user, String password){
-        ConnectionManager connectionManager = new ConnectionManager();
-        connectionManager.connect(url, user, password);
+    public void connect(String url, String user, String password) throws ConnectionFailedException{
+        if(null == connectionManager.connect(url, user, password)){
+            throw new ConnectionFailedException();
+        }
     }
 
 
