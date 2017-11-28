@@ -3,7 +3,6 @@ package com.satellite;
 import com.satellite.annotation.Id;
 import com.satellite.exception.NoIdAnnotation;
 
-import java.io.Serializable;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -28,36 +27,49 @@ public class Satellite<T> {
         pendingList.add(t);
     }
 
-    public T findById(Serializable id) {
-        if (idSameType(id.getClass())) {
-            for (T t : pendingList) {
-                if (getIdValue(t) == id) {
-                    return t;
-                }
+    public T findById(Object id) {
+        for (T t : pendingList) {
+            if (getIdValue(t).equals(id)) {
+                return t;
             }
         }
         return null;
     }
 
-    private boolean idSameType(Class serializableClass) {
-        return (serializableClass == idClass);
-    }
 
-    private Serializable getIdValue(T t) {
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    private Object getIdValue(T t) {
         try {
-            for(Field field : beanClass.getDeclaredFields()){
+            for(Field field : t.getClass().getDeclaredFields()){
                 Annotation[] annotations = field.getDeclaredAnnotations();
-
                 for (Annotation annotation:annotations) {
-                    if (annotation.annotationType() == Id.class) { /// La variable qui est l'idClass
-
-                        ...........
+                    if (annotation.annotationType() == Id.class) {
+                        field.setAccessible(true);
+                        return field.get(t);
                     }
                 }
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
+        return null;
     }
 
     public void printClassInformation() {

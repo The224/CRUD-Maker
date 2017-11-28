@@ -13,13 +13,16 @@ public class Main {
         }
 
 
-        satellite.insert(new UserExample("Gabriel", 90));
-        satellite.insert(new UserExample("Karla", 34));
-        satellite.insert(new UserExample("Tyrion", 56));
-        satellite.insert(new UserExample("Alec", 78));
+        satellite.insert(new UserExample(1,"Gabriel", 90));
+        satellite.insert(new UserExample(2,"Karla", 34));
+        satellite.insert(new UserExample(3,"Tyrion", 56));
+        satellite.insert(new UserExample(4,"Alec", 78));
 
-        UserExample user = new UserExample("TestName", 100);
 
-        satellite.printClassInformation();
+        satellite.findById(1);
+
+        UserExample user = new UserExample(5,"TestName", 100);
+
+        // satellite.printClassInformation();
     }
 }

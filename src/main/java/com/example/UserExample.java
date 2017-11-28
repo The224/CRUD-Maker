@@ -6,16 +6,17 @@ import javax.persistence.Column;
 
 public class UserExample {
 
-    @Id(name="PK_ID")
-    private int id;
+    @Id
+    private Integer id;
     @Column(name = "NAME")
     private String name;
     @Column(name = "AGE")
     private int age;
 
-    public UserExample(String name, int age) {
+    public UserExample(int id, String name, int age) {
         this.name = name;
         this.age = age;
+        this.id = id;
     }
 
     public int getId() {

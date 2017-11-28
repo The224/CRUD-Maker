@@ -7,7 +7,7 @@ import static org.junit.Assert.*;
 public class SatelliteTest {
 
     private class User {
-        @Id(name="ID")
+        @Id
         public int id;
         public String name;
         public int age;
