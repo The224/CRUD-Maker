@@ -1,13 +1,13 @@
 package com.satellite;
 
-public class Linker {
+public class ConnexionManager {
 
     private String hostIp;
     private String hostName;
     private String hostPassword;
     private Integer hostPort;
 
-    public Linker(String hostIp, String hostName, String hostPassword, Integer hostPort) {
+    public ConnexionManager(String hostIp, String hostName, String hostPassword) {
         this.hostIp = hostIp;
         this.hostName = hostName;
         this.hostPassword = hostPassword;
@@ -22,7 +22,7 @@ public class Linker {
 
     }
 
-    public void fetchWithQuery() {
+    public void fetchByQuery(String query) {
 
     }
 
