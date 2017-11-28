@@ -1,5 +1,9 @@
 package com.satellite;
 
+import com.satellite.annotation.Id;
+import com.satellite.exception.NoIdAnnotation;
+
+import java.io.Serializable;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -7,60 +11,58 @@ import java.util.Arrays;
 import java.util.List;
 
 public class Satellite<T> {
-    // Liste des objects deja dans la base de donnees
-    private List<T> inDbList;
-    // Liste des objects avant d'etre envoyer dans la base de donnees
+
     private List<T> pendingList;
-    private Linker linker;
+    private Class beanClass;
 
-    public Satellite(String hostIp, String hostName, String hostPassword) {
-        linker = new Linker(hostIp, hostName, hostPassword);
+    private Class idClass;
+
+    public Satellite(Class beanClass) throws NoIdAnnotation{
         pendingList = new ArrayList<T>();
+        this.beanClass = beanClass;
 
+        setIdClass();
     }
 
     public void insert(T t) {
         pendingList.add(t);
     }
 
-    public void insertNow(T t) {// Bypass le pending et va directement dans la db
+    public T findById(Serializable id) {
+        if (idSameType(id.getClass())) {
+            for (T t : pendingList) {
+                if (getIdValue(t) == id) {
+                    return t;
+                }
+            }
+        }
+        return null;
     }
 
-    public T read(int i) {
-        return pendingList.get(i);
+    private boolean idSameType(Class serializableClass) {
+        return (serializableClass == idClass);
     }
 
-    public void update(int t) {
-    }
-
-    public void updateNow(int t) {// Bypass le pending et va directement dans la db
-    }
-
-    public void delete(T t) {
-        pendingList.remove(t);
-    }
-
-    public void deleteNow(T t) {// Bypass le pending et va directement dans la db
-    }
-
-    // Envoie toute les modifications au serveur
-    public void push() {
-
-    }
-
-
-
-
-
-
-
-
-
-
-
-    public void printClassInformation(T t) {
+    private Serializable getIdValue(T t) {
         try {
-            for(Field field : t.getClass().getDeclaredFields()){
+            for(Field field : beanClass.getDeclaredFields()){
+                Annotation[] annotations = field.getDeclaredAnnotations();
+
+                for (Annotation annotation:annotations) {
+                    if (annotation.annotationType() == Id.class) { /// La variable qui est l'idClass
+
+                        ...........
+                    }
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void printClassInformation() {
+        try {
+            for(Field field : beanClass.getDeclaredFields()){
                 Class type = field.getType();
                 String name = field.getName();
                 Annotation[] annotations = field.getDeclaredAnnotations();
@@ -73,5 +75,31 @@ public class Satellite<T> {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    private void setIdClass() throws NoIdAnnotation {
+        try {
+            for(Field field : beanClass.getDeclaredFields()){
+                Annotation[] annotations = field.getDeclaredAnnotations();
+
+                for (Annotation annotation:annotations) {
+                    if (annotation.annotationType() == Id.class) { /// La variable qui est l'idClass
+
+                        idClass = field.getType();
+                        /*
+                        Class type = field.getType();
+                        String name = field.getName();
+                        System.out.println(type);
+                        System.out.println(name);
+                        System.out.println(annotation);
+                        */
+                        return;
+                    }
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        throw new NoIdAnnotation();
     }
 }
