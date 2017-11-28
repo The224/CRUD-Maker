@@ -34,6 +34,12 @@ public class Satellite<T> {
         return true;
     }
 
+    public void connect(String url, String user, String password){
+        ConnectionManager connectionManager = new ConnectionManager();
+        connectionManager.connect(url, user, password);
+    }
+
+
     public T findById(@NotNull Object id) {
         for (T t : fetchList) {
             if (getIdValue(t).equals(id)) {
