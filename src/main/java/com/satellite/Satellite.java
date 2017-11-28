@@ -2,11 +2,13 @@ package com.satellite;
 
 import com.satellite.annotation.Id;
 import com.satellite.exception.ConnectionFailedException;
+import com.satellite.exception.NoConnectionOpenedException;
 import com.satellite.exception.NoIdAnnotationException;
 import com.sun.istack.internal.NotNull;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
+import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -19,6 +21,8 @@ public class Satellite<T> {
     private List<T> pendingList;
     // Class du generic
     private Class beanClass;
+
+    private TransferService transferService = new TransferService();
 
     private ConnectionManager connectionManager;
 
@@ -100,9 +104,18 @@ public class Satellite<T> {
     /**
      * Envoie les modifications de pendingList dans fetchList et la BD
      */
-    public void push() {
+    public void push() throws NoConnectionOpenedException {
+        Connection connection = connectionManager.getConnection();
+
+        if(null != connection){
+            transferService.push(pendingList, connectionManager.getConnection());
+        }
+        else{
+            throw new NoConnectionOpenedException();
+        }
+
         fetchList.addAll(pendingList);
-        // TODO : envoyer sur la BD
+        pendingList = new ArrayList<T>();
     }
 
     private Object getIdValue(T t) {

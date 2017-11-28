@@ -33,6 +33,7 @@ public class ConnectionManager {
         }
     }
 
-
-
+    public Connection getConnection() {
+        return connection;
+    }
 }
