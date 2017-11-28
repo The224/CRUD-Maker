@@ -1,6 +1,8 @@
 package com.satellite;
 
-import javax.jms.Session;
+import com.jcraft.jsch.JSch;
+import com.jcraft.jsch.Session;
+
 import javax.security.auth.login.Configuration;
 import java.sql.Connection;
 import java.sql.DriverManager;
