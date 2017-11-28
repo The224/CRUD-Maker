@@ -2,6 +2,7 @@ package com.satellite;
 
 import com.satellite.annotation.Id;
 import com.satellite.exception.NoIdAnnotation;
+import com.sun.istack.internal.NotNull;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
@@ -10,25 +11,25 @@ import java.util.Arrays;
 import java.util.List;
 
 public class Satellite<T> {
-
+    // Liste de la BD
+    private List<T> fetchList;
+    // Liste des modification qui ne sont pas dans la BD
     private List<T> pendingList;
+    // Class du generic
     private Class beanClass;
-
-    private Class idClass;
 
     public Satellite(Class beanClass) throws NoIdAnnotation{
         pendingList = new ArrayList<T>();
+        fetchList = new ArrayList<T>();
         this.beanClass = beanClass;
-
-        setIdClass();
     }
 
     public void insert(T t) {
         pendingList.add(t);
     }
 
-    public T findById(Object id) {
-        for (T t : pendingList) {
+    public T findById(@NotNull Object id) {
+        for (T t : fetchList) {
             if (getIdValue(t).equals(id)) {
                 return t;
             }
@@ -36,12 +37,36 @@ public class Satellite<T> {
         return null;
     }
 
+    public List<T> findAll() {
+        return fetchList;
+    }
+
+    public boolean remove(@NotNull Object id) {
+        for (T t : fetchList) {
+            if (getIdValue(t).equals(id)) {
+                fetchList.remove(t);
+                return true;
+            }
+        }
+        // TODO : A voir !!!!
+        for (T t : pendingList) {
+            if (getIdValue(t).equals(id)) {
+                pendingList.remove(t);
+                return true;
+            }
+        }
+        return false;
+    }
 
 
 
-
-
-
+    /**
+     * Envoie les modifications de pendingList dans fetchList et la BD
+     */
+    public void push() {
+        fetchList.addAll(pendingList);
+        // TODO : envoyer sur la BD
+    }
 
 
 
@@ -87,31 +112,5 @@ public class Satellite<T> {
         } catch (Exception e) {
             e.printStackTrace();
         }
-    }
-
-    private void setIdClass() throws NoIdAnnotation {
-        try {
-            for(Field field : beanClass.getDeclaredFields()){
-                Annotation[] annotations = field.getDeclaredAnnotations();
-
-                for (Annotation annotation:annotations) {
-                    if (annotation.annotationType() == Id.class) { /// La variable qui est l'idClass
-
-                        idClass = field.getType();
-                        /*
-                        Class type = field.getType();
-                        String name = field.getName();
-                        System.out.println(type);
-                        System.out.println(name);
-                        System.out.println(annotation);
-                        */
-                        return;
-                    }
-                }
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        throw new NoIdAnnotation();
     }
 }
