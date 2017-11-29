@@ -10,21 +10,21 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
-public class TransferService<T> {
+public class TransferDataService<T> {
 
     private static final String TABLE_NAME = "test";
     private Class classType;
 
-    public TransferService(Class classType) {
+    public TransferDataService(Class classType) {
         this.classType = classType;
     }
 
 
     public void push(List<T> pendingList, Connection connection) throws Exception{
 
-        List<Field> fieldsList = new ArrayList<Field>();
-
         for (T entity : pendingList) {
+
+            List<Field> fieldsList = new ArrayList<Field>();
             Field[] fields = entity.getClass().getDeclaredFields();
 
             for (Field field : fields) {
@@ -32,21 +32,26 @@ public class TransferService<T> {
                 Annotation[] annotations = field.getDeclaredAnnotations();
                 for (Annotation annotation : annotations) {
                     if (annotation.annotationType() == Id.class) {
-                        field.setAccessible(true);
                         fieldsList.add(0, field);
                     }
-                    fieldsList.add(field);
+                    else{
+                        fieldsList.add(field);
+                    }
                 }
             }
 
             String query = "insert into " + entity.getClass().getSimpleName() + " values(";
 
             for(Field field : fieldsList){
+                field.setAccessible(true);
+
+                String fieldValue = (String.class == field.getType()) ? "'" + field.get(entity).toString() + "'" : field.get(entity).toString();
+
                 if(fieldsList.size()-1 != fieldsList.indexOf(field)){
-                    query += field.get(entity).toString() + ",";
+                    query += fieldValue + ",";
                 }
                 else{
-                    query += field.get(entity).toString() + ");";
+                    query += fieldValue + ");";
                 }
             }
             System.out.println(query);

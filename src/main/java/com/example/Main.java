@@ -21,7 +21,7 @@ public class Main {
 
         satellite.connect("localhost:3306/", "root", "");
         satellite.push();
-        satellite.findById(1);
+        //satellite.findById(1);
 
     }
 }
