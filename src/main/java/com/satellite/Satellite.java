@@ -43,7 +43,6 @@ public class Satellite<T> {
     }
 
     public void connect(String hostName, String port, String database, String user, String password) throws ConnectionFailedException {
-
         String url = "jdbc:mysql://" + hostName + ":" + port + "/" + database;
         if (null == connectionManager.connect(url, user, password)) {
             throw new ConnectionFailedException();
@@ -93,6 +92,9 @@ public class Satellite<T> {
      * Recois toutes les informations de la BD
      */
     public void fetchAllByClass(Class classType) {
+        if(!fetchList.isEmpty()){
+            fetchList = new ArrayList<T>();
+        }
         fetchList = transferService.fetchAllByClass(classType, connectionManager.getConnection());
     }
 
