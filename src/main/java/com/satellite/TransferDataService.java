@@ -7,7 +7,6 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.lang.reflect.ParameterizedType;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -116,8 +115,11 @@ public class TransferDataService<T> {
     }
 
     public List<T> fetchAllByClass(Class classType, Connection connection) throws NoEmptyConstructorException {
-
         String sql = "SELECT * FROM " + classType.getSimpleName();
+        return fetchDataByQuery(classType, connection, sql);
+    }
+
+    public List<T> fetchDataByQuery(Class classType, Connection connection, String sql) {
         Field[] fields = classType.getDeclaredFields();
         List<T> list = new ArrayList<T>();
 
@@ -137,7 +139,7 @@ public class TransferDataService<T> {
                         for(Method method : methods){
                             if(isSetterMethod(method)){ ;
                                 for(Field field : fields){
-                                    if(methodNameIsEqualToFieldName(method, field)){
+                                        if(methodNameIsEqualToFieldName(method, field)){
                                         method.invoke(t,  rs.getObject(field.getName()));
                                     }
                                 }
@@ -184,17 +186,4 @@ public class TransferDataService<T> {
     public void fetchByQuery(String query) {
 
     }
-
-    private Object test(T t) {
-        try {
-            for (Field field : t.getClass().getDeclaredFields()) {
-                field.get(t);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
-
-
 }

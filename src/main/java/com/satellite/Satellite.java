@@ -22,7 +22,7 @@ public class Satellite<T> {
     // Class du generic
     //private Class beanClass;
 
-    private TransferDataService transferService;
+    private TransferDataService transferDataService;
 
     private ConnectionManager connectionManager;
 
@@ -30,7 +30,7 @@ public class Satellite<T> {
         pendingList = new ArrayList<T>();
         fetchList = new ArrayList<T>();
         connectionManager = new ConnectionManager();
-        transferService = new TransferDataService();
+        transferDataService = new TransferDataService();
     }
 
     public boolean insert(T obj) {
@@ -93,15 +93,16 @@ public class Satellite<T> {
         if(!fetchList.isEmpty()){
             fetchList = new ArrayList<T>();
         }
-        fetchList = transferService.fetchAllByClass(classType, connectionManager.getConnection());
+        fetchList = transferDataService.fetchAllByClass(classType, connectionManager.getConnection());
         return this;
     }
 
-    /**
-     * Recois les informations specifier dans la query
-     */
-    public void fetchByQuery(String query) {
-        // TODO : recois de la BD
+    public Satellite fetchAllByCondition(Class classType, String query) {
+        if(!fetchList.isEmpty()){
+            fetchList = new ArrayList<T>();
+        }
+        fetchList = transferDataService.fetchDataByQuery(classType, connectionManager.getConnection(), query);
+        return this;
     }
 
     /**
@@ -111,7 +112,7 @@ public class Satellite<T> {
         Connection connection = connectionManager.getConnection();
 
         if (null != connection) {
-            transferService.push(pendingList, connectionManager.getConnection());
+            transferDataService.push(pendingList, connectionManager.getConnection());
         } else {
             throw new NoConnectionOpenedException();
         }
