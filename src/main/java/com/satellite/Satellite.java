@@ -96,7 +96,7 @@ public class Satellite<T> {
         fetchList = transferDataService.fetchAllByClass(classType, connectionManager.getConnection());
         return this;
     }
-
+    
     public Satellite fetchAllByCondition(Class classType, String condition) {
         if(!fetchList.isEmpty()){
             fetchList = new ArrayList<T>();
@@ -104,6 +104,10 @@ public class Satellite<T> {
         String sql = "select * from " + classType.getSimpleName() + " where " + condition + ";";
         fetchList = transferDataService.fetchDataByQuery(classType, connectionManager.getConnection(), sql);
         return this;
+    }
+
+    public Satellite fetchByQuery(){
+        return null;
     }
 
     /**
