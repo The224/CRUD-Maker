@@ -19,11 +19,11 @@ public class TransferDataService<T> {
         this.classType = classType;
     }
 
-    public void push(List<T> pendingList, Connection connection) throws Exception{
+    public void push(List<T> pendingList, Connection connection) throws Exception {
 
         for (T entity : pendingList) {
 
-            if(!entityTableExists(connection, entity)){
+            if (!entityTableExists(connection, entity)) {
                 createSQLTableFromEntity(connection, entity);
             }
             persistEntityValues(connection, entity);
@@ -33,49 +33,55 @@ public class TransferDataService<T> {
     private void persistEntityValues(Connection connection, T entity) throws IllegalAccessException {
 
         List<Field> fieldsList = getOrderedFieldsList(entity);
-        String sql = "insert into " + entity.getClass().getSimpleName() + " values(";
+        String sql = writeInsertInto(entity);
 
-        for(Field field : fieldsList){
+        for (Field field : fieldsList) {
             field.setAccessible(true);
-
             String fieldValue = (String.class == field.getType()) ? "'" + field.get(entity).toString() + "'" : field.get(entity).toString();
-            sql += (fieldsList.size()-1 != fieldsList.indexOf(field)) ? fieldValue + ", " : fieldValue + ");";
+            sql += (fieldsList.size() - 1 != fieldsList.indexOf(field)) ? fieldValue + ", " : fieldValue + ");";
         }
         executeSQLUpdate(connection, sql);
+    }
+
+    private String writeInsertInto(T entity) {
+        return "insert into " + entity.getClass().getSimpleName() + " values(";
     }
 
     private Boolean entityTableExists(Connection connection, T entity) throws SQLException {
         DatabaseMetaData metaData = connection.getMetaData();
         ResultSet tables = metaData.getTables(null, null, entity.getClass().getSimpleName(), null);
-
-        if(!tables.next()){
-            return false;
-        }
-        return true;
+        return tables.next();
     }
 
     private void createSQLTableFromEntity(Connection connection, T entity) throws SQLException {
 
         List<Field> fieldsList = getOrderedFieldsList(entity);
-        String sql = "create table " + entity.getClass().getSimpleName() + "(";
+        String sql = writeCreateTable(entity);
         String idName = "";
 
-        for(Field field : fieldsList) {
+        for (Field field : fieldsList) {
 
             if (0 == fieldsList.indexOf(field)) {
                 idName = field.getName();
             }
-
             sql += field.getName();
 
             if (Integer.class == field.getType() || int.class == field.getType()) {
-                sql += " " + SQL_INTEGER_TYPE+ ", ";
+                sql += " " + SQL_INTEGER_TYPE + ", ";
             } else if (String.class == field.getType()) {
                 sql += " " + SQL_STRING_TYPE + "(40), ";
             }
         }
-        sql += "PRIMARY KEY(" + idName + "));";
+        sql += writePrimaryKey(idName);
         executeSQLUpdate(connection, sql);
+    }
+
+    private String writeCreateTable(T entity) {
+        return "create table " + entity.getClass().getSimpleName() + "(";
+    }
+
+    private String writePrimaryKey(String idName) {
+        return "PRIMARY KEY(" + idName + "));";
     }
 
     private void executeSQLUpdate(Connection connection, String sql) {
@@ -93,22 +99,24 @@ public class TransferDataService<T> {
         List<Field> orderedList = new ArrayList<Field>();
 
         for (Field field : fields) {
-
-            Annotation[] annotations = field.getDeclaredAnnotations();
-            for (Annotation annotation : annotations) {
-                if (annotation.annotationType() == Id.class) {
-                    orderedList.add(0, field);
-                }
-                else{
-                    orderedList.add(field);
-                }
-            }
+            addToFieldsListInOrder(orderedList, field);
         }
         return orderedList;
     }
 
+    private void addToFieldsListInOrder(List<Field> orderedList, Field field) {
+        Annotation[] annotations = field.getDeclaredAnnotations();
+        for (Annotation annotation : annotations) {
+            if (annotation.annotationType() == Id.class) {
+                orderedList.add(0, field);
+            } else {
+                orderedList.add(field);
+            }
+        }
+    }
+
     public List<T> fetchAll(Statement statement) {
-        String sql = "SELECT * FROM "+TABLE_NAME;
+        String sql = "SELECT * FROM " + TABLE_NAME;
         List<T> liste = new ArrayList<T>();
 
         try {
@@ -116,7 +124,7 @@ public class TransferDataService<T> {
 
             Field[] fields = classType.getDeclaredFields();
 
-            while(rs.next()){
+            while (rs.next()) {
                 Object[] variables = new Object[fields.length];
 
                 for (int i = 0; i < fields.length; i++) {
@@ -149,7 +157,7 @@ public class TransferDataService<T> {
 
     private Object test(T t) {
         try {
-            for(Field field : t.getClass().getDeclaredFields()){
+            for (Field field : t.getClass().getDeclaredFields()) {
                 field.get(t);
             }
         } catch (Exception e) {

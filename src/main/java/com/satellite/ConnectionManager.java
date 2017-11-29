@@ -8,10 +8,15 @@ import com.jcraft.jsch.Session;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.sql.Statement;
 
 public class ConnectionManager {
 
     private Connection connection;
+
+    public Connection getConnection() {
+        return connection;
+    }
 
     public Connection connect(String url, String user, String password) {
 
@@ -31,9 +36,5 @@ public class ConnectionManager {
         if(null != connection){
             connection.close();
         }
-    }
-
-    public Connection getConnection() {
-        return connection;
     }
 }
