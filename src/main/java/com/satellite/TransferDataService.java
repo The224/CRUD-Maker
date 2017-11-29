@@ -3,7 +3,10 @@ package com.satellite;
 import com.satellite.annotation.Id;
 
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.lang.reflect.ParameterizedType;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -113,35 +116,45 @@ public class TransferDataService<T> {
     public List<T> fetchAll(Class classType, Connection connection) {
 
         String sql = "SELECT * FROM " + classType.getSimpleName();
+        Field[] fields = classType.getDeclaredFields();
         List<T> fetchList = new ArrayList<T>();
 
         try {
             Statement statement = connection.createStatement();
             ResultSet rs = statement.executeQuery(sql);
 
-            Field[] fields = classType.getDeclaredFields();
-
             while (rs.next()) {
-                Object[] variables = new Object[fields.length];
 
-                for (int i = 0; i < fields.length; i++) {
+                T t = null;
 
-                    variables[i] = rs.getObject(fields[i].getName());
+                Constructor[] constructors = classType.getDeclaredConstructors();
+                Method[] methods = classType.getDeclaredMethods();
 
-                    T t = (T) buildOne(classType);
-                    System.out.println(t.getClass().getMethods());
+                for(Constructor constructor: constructors){
 
-                    //fields[i].set(t ,);
+                    if(0 == constructor.getParameterTypes().length){
 
+                        t = (T) constructor.newInstance();
+
+                        for(Method method : methods){
+                            if("set".equals(method.getName().substring(0, 3).toLowerCase())){ ;
+                                for(Field field : fields){
+                                    if(method.getName().substring(3).toLowerCase().equals(field.getName().toLowerCase())){
+                                        method.invoke(t,  rs.getObject(field.getName()));
+                                    }
+                                }
+                            }
+                        }
+                        break;
+                    }
                 }
-
-
+                if(null != t) {
+                    fetchList.add(t);
+                }
             }
-
         } catch (Exception e) {
             e.printStackTrace();
         }
-
         return fetchList;
     }
 

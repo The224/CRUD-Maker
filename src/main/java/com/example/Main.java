@@ -2,6 +2,8 @@ package com.example;
 
 import com.satellite.Satellite;
 
+import java.util.List;
+
 public class Main {
     public static void main(String... args) throws Exception{
         Satellite<UserExample> satellite = null;
@@ -19,7 +21,11 @@ public class Main {
 
         satellite.connect("localhost", "3306", "testSatellite", "root", "");
         //satellite.push();
-        satellite.fetchAll();
+        List<UserExample> users = satellite.fetchAll(UserExample.class);
+
+        for(UserExample user : users){
+            System.out.println(user.toString());
+        }
         satellite.closeConnection();
         //satellite.findById(1);
 

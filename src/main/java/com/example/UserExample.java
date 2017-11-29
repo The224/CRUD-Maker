@@ -13,6 +13,10 @@ public class UserExample {
     @Column(name = "AGE")
     private int age;
 
+    public UserExample(){
+
+    }
+
     public UserExample(int id, String name, int age) {
         this.name = name;
         this.age = age;
