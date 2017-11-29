@@ -18,7 +18,7 @@ public class ConnectionManager {
         connection = null;
 
         try {
-            connection = DriverManager.getConnection("jdbc:mysql://" + url, user, password);
+            connection = DriverManager.getConnection(url, user, password);
             System.out.println("Connexion réussie !");
         } catch (Exception e) {
             System.out.println("Problème de connexion: ");

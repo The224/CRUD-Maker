@@ -17,8 +17,9 @@ public class Main {
         satellite.insert(new UserExample(3,"Tyrion", 56));
         satellite.insert(new UserExample(4,"Alec", 78));
 
-        satellite.connect("localhost:3306/testSatellite", "root", "");
-        satellite.push();
+        satellite.connect("localhost", "3306", "testSatellite", "root", "");
+        //satellite.push();
+        satellite.closeConnection();
         //satellite.findById(1);
 
     }

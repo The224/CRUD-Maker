@@ -44,13 +44,15 @@ public class Satellite<T> {
         return true;
     }
 
-    public void connect(String url, String user, String password) throws ConnectionFailedException{
-        if(null == connectionManager.connect(url, user, password)){
+    public void connect(String hostName, String port, String database, String user, String password) throws ConnectionFailedException {
+
+        String url = "jdbc:mysql://" + hostName + ":" + port + "/" + database;
+        if (null == connectionManager.connect(url, user, password)) {
             throw new ConnectionFailedException();
         }
     }
 
-    public void closeConnection() throws SQLException{
+    public void closeConnection() throws SQLException {
         connectionManager.close();
     }
 
@@ -109,10 +111,9 @@ public class Satellite<T> {
     public void push() throws Exception {
         Connection connection = connectionManager.getConnection();
 
-        if(null != connection){
+        if (null != connection) {
             transferService.push(pendingList, connectionManager.getConnection());
-        }
-        else{
+        } else {
             throw new NoConnectionOpenedException();
         }
 
@@ -123,9 +124,9 @@ public class Satellite<T> {
     private Object getIdValue(T t) {
 
         try {
-            for(Field field : t.getClass().getDeclaredFields()){
+            for (Field field : t.getClass().getDeclaredFields()) {
                 Annotation[] annotations = field.getDeclaredAnnotations();
-                for (Annotation annotation:annotations) {
+                for (Annotation annotation : annotations) {
                     if (annotation.annotationType() == Id.class) {
                         field.setAccessible(true);
                         return field.get(t);
@@ -140,7 +141,7 @@ public class Satellite<T> {
 
     public void printClassInformation() {
         try {
-            for(Field field : beanClass.getDeclaredFields()){
+            for (Field field : beanClass.getDeclaredFields()) {
                 Class type = field.getType();
                 String name = field.getName();
                 Annotation[] annotations = field.getDeclaredAnnotations();
