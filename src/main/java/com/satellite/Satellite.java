@@ -20,18 +20,17 @@ public class Satellite<T> {
     // Liste des modification qui ne sont pas dans la BD
     private List<T> pendingList;
     // Class du generic
-    private Class beanClass;
+    //private Class beanClass;
 
-    private TransferDataService transferService;
+    private TransferDataService transferDataService;
 
     private ConnectionManager connectionManager;
 
     public Satellite(Class beanClass) throws NoIdAnnotationException {
         pendingList = new ArrayList<T>();
         fetchList = new ArrayList<T>();
-        this.beanClass = beanClass;
         connectionManager = new ConnectionManager();
-        transferService = new TransferDataService(beanClass);
+        transferDataService = new TransferDataService();
     }
 
     public boolean insert(T obj) {
@@ -94,8 +93,8 @@ public class Satellite<T> {
     /**
      * Recois toutes les informations de la BD
      */
-    public void fetchAll() {
-        // TODO : recois de la BD
+    public void fetchAll(Class classType) {
+        transferDataService.fetchAll(classType, connectionManager.getConnection());
     }
 
     /**
@@ -112,7 +111,7 @@ public class Satellite<T> {
         Connection connection = connectionManager.getConnection();
 
         if (null != connection) {
-            transferService.push(pendingList, connectionManager.getConnection());
+            transferDataService.push(pendingList, connectionManager.getConnection());
         } else {
             throw new NoConnectionOpenedException();
         }
@@ -139,7 +138,7 @@ public class Satellite<T> {
         return null;
     }
 
-    public void printClassInformation() {
+    /*public void printClassInformation() {
         try {
             for (Field field : beanClass.getDeclaredFields()) {
                 Class type = field.getType();
@@ -154,5 +153,5 @@ public class Satellite<T> {
         } catch (Exception e) {
             e.printStackTrace();
         }
-    }
+    }*/
 }

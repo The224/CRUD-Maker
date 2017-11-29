@@ -13,11 +13,6 @@ public class TransferDataService<T> {
     public static final String SQL_INTEGER_TYPE = "INT";
     public static final String SQL_STRING_TYPE = "VARCHAR";
     private static final String TABLE_NAME = "test";
-    private Class classType;
-
-    public TransferDataService(Class classType) {
-        this.classType = classType;
-    }
 
     public void push(List<T> pendingList, Connection connection) throws Exception {
 
@@ -115,11 +110,13 @@ public class TransferDataService<T> {
         }
     }
 
-    public List<T> fetchAll(Statement statement) {
-        String sql = "SELECT * FROM " + TABLE_NAME;
-        List<T> liste = new ArrayList<T>();
+    public List<T> fetchAll(Class classType, Connection connection) {
+
+        String sql = "SELECT * FROM " + classType.getSimpleName();
+        List<T> fetchList = new ArrayList<T>();
 
         try {
+            Statement statement = connection.createStatement();
             ResultSet rs = statement.executeQuery(sql);
 
             Field[] fields = classType.getDeclaredFields();
@@ -131,7 +128,8 @@ public class TransferDataService<T> {
 
                     variables[i] = rs.getObject(fields[i].getName());
 
-                    T t = (T) buildOne();
+                    T t = (T) buildOne(classType);
+                    System.out.println(t.getClass().getMethods());
 
                     //fields[i].set(t ,);
 
@@ -144,10 +142,10 @@ public class TransferDataService<T> {
             e.printStackTrace();
         }
 
-        return liste;
+        return fetchList;
     }
 
-    public Object buildOne() throws InstantiationException, IllegalAccessException {
+    public Object buildOne(Class classType) throws InstantiationException, IllegalAccessException {
         return classType.newInstance();
     }
 

@@ -18,7 +18,8 @@ public class Main {
         satellite.insert(new UserExample(12,"Alec", 78));
 
         satellite.connect("localhost", "3306", "testSatellite", "root", "");
-        satellite.push();
+        //satellite.push();
+        satellite.fetchAll();
         satellite.closeConnection();
         //satellite.findById(1);
 
