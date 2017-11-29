@@ -5,6 +5,7 @@ import com.satellite.annotation.Id;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.sql.Connection;
+import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
@@ -39,6 +40,34 @@ public class TransferDataService<T> {
                     }
                 }
             }
+            DatabaseMetaData metaData = connection.getMetaData();
+            ResultSet tables = metaData.getTables(null, null, entity.getClass().getSimpleName(), null);
+
+            if(!tables.next()){
+
+                String queryCreate = "create table " + entity.getClass().getSimpleName() + "(";
+                String idName = "";
+
+                for(Field field : fieldsList) {
+
+                    if (0 == fieldsList.indexOf(field)) {
+                        idName = field.getName();
+                    }
+
+                    queryCreate += field.getName();
+
+                    if (Integer.class == field.getType() || int.class == field.getType()) {
+                        queryCreate += " INT, ";
+                    } else if (String.class == field.getType()) {
+                        queryCreate += " VARCHAR(40), ";
+                    }
+                }
+                queryCreate += "PRIMARY KEY(" + idName + "));";
+                System.out.println(queryCreate);
+                Statement statement = connection.createStatement();
+                int result = statement.executeUpdate(queryCreate);
+            }
+
 
             String query = "insert into " + entity.getClass().getSimpleName() + " values(";
 
@@ -48,7 +77,7 @@ public class TransferDataService<T> {
                 String fieldValue = (String.class == field.getType()) ? "'" + field.get(entity).toString() + "'" : field.get(entity).toString();
 
                 if(fieldsList.size()-1 != fieldsList.indexOf(field)){
-                    query += fieldValue + ",";
+                    query += fieldValue + ", ";
                 }
                 else{
                     query += fieldValue + ");";
@@ -58,7 +87,7 @@ public class TransferDataService<T> {
 
             try {
                 Statement statement = connection.createStatement();
-                ResultSet result = statement.executeQuery(query);
+                int result = statement.executeUpdate(query);
             } catch (Exception e) {
                 e.printStackTrace();
             }
