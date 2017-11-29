@@ -22,7 +22,7 @@ public class Satellite<T> {
     // Class du generic
     private Class beanClass;
 
-    private TransferService transferService = new TransferService();
+    private TransferService transferService;
 
     private ConnectionManager connectionManager;
 
@@ -31,6 +31,7 @@ public class Satellite<T> {
         fetchList = new ArrayList<T>();
         this.beanClass = beanClass;
         connectionManager = new ConnectionManager();
+        transferService = new TransferService(beanClass);
     }
 
     public boolean insert(T obj) {
