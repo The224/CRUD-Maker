@@ -4,15 +4,14 @@ import com.satellite.annotation.Id;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
-import java.sql.Connection;
-import java.sql.DatabaseMetaData;
-import java.sql.ResultSet;
-import java.sql.Statement;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
 public class TransferDataService<T> {
 
+    public static final String SQL_INTEGER_TYPE = "INT";
+    public static final String SQL_STRING_TYPE = "VARCHAR";
     private static final String TABLE_NAME = "test";
     private Class classType;
 
@@ -20,78 +19,92 @@ public class TransferDataService<T> {
         this.classType = classType;
     }
 
-
     public void push(List<T> pendingList, Connection connection) throws Exception{
 
         for (T entity : pendingList) {
 
-            List<Field> fieldsList = new ArrayList<Field>();
-            Field[] fields = entity.getClass().getDeclaredFields();
-
-            for (Field field : fields) {
-
-                Annotation[] annotations = field.getDeclaredAnnotations();
-                for (Annotation annotation : annotations) {
-                    if (annotation.annotationType() == Id.class) {
-                        fieldsList.add(0, field);
-                    }
-                    else{
-                        fieldsList.add(field);
-                    }
-                }
+            if(!entityTableExists(connection, entity)){
+                createSQLTableFromEntity(connection, entity);
             }
-            DatabaseMetaData metaData = connection.getMetaData();
-            ResultSet tables = metaData.getTables(null, null, entity.getClass().getSimpleName(), null);
+            persistEntityValues(connection, entity);
+        }
+    }
 
-            if(!tables.next()){
+    private void persistEntityValues(Connection connection, T entity) throws IllegalAccessException {
 
-                String queryCreate = "create table " + entity.getClass().getSimpleName() + "(";
-                String idName = "";
+        List<Field> fieldsList = getOrderedFieldsList(entity);
+        String sql = "insert into " + entity.getClass().getSimpleName() + " values(";
 
-                for(Field field : fieldsList) {
+        for(Field field : fieldsList){
+            field.setAccessible(true);
 
-                    if (0 == fieldsList.indexOf(field)) {
-                        idName = field.getName();
-                    }
+            String fieldValue = (String.class == field.getType()) ? "'" + field.get(entity).toString() + "'" : field.get(entity).toString();
+            sql += (fieldsList.size()-1 != fieldsList.indexOf(field)) ? fieldValue + ", " : fieldValue + ");";
+        }
+        executeSQLUpdate(connection, sql);
+    }
 
-                    queryCreate += field.getName();
+    private Boolean entityTableExists(Connection connection, T entity) throws SQLException {
+        DatabaseMetaData metaData = connection.getMetaData();
+        ResultSet tables = metaData.getTables(null, null, entity.getClass().getSimpleName(), null);
 
-                    if (Integer.class == field.getType() || int.class == field.getType()) {
-                        queryCreate += " INT, ";
-                    } else if (String.class == field.getType()) {
-                        queryCreate += " VARCHAR(40), ";
-                    }
-                }
-                queryCreate += "PRIMARY KEY(" + idName + "));";
-                System.out.println(queryCreate);
-                Statement statement = connection.createStatement();
-                int result = statement.executeUpdate(queryCreate);
+        if(!tables.next()){
+            return false;
+        }
+        return true;
+    }
+
+    private void createSQLTableFromEntity(Connection connection, T entity) throws SQLException {
+
+        List<Field> fieldsList = getOrderedFieldsList(entity);
+        String sql = "create table " + entity.getClass().getSimpleName() + "(";
+        String idName = "";
+
+        for(Field field : fieldsList) {
+
+            if (0 == fieldsList.indexOf(field)) {
+                idName = field.getName();
             }
 
+            sql += field.getName();
 
-            String query = "insert into " + entity.getClass().getSimpleName() + " values(";
-
-            for(Field field : fieldsList){
-                field.setAccessible(true);
-
-                String fieldValue = (String.class == field.getType()) ? "'" + field.get(entity).toString() + "'" : field.get(entity).toString();
-
-                if(fieldsList.size()-1 != fieldsList.indexOf(field)){
-                    query += fieldValue + ", ";
-                }
-                else{
-                    query += fieldValue + ");";
-                }
-            }
-            System.out.println(query);
-
-            try {
-                Statement statement = connection.createStatement();
-                int result = statement.executeUpdate(query);
-            } catch (Exception e) {
-                e.printStackTrace();
+            if (Integer.class == field.getType() || int.class == field.getType()) {
+                sql += " " + SQL_INTEGER_TYPE+ ", ";
+            } else if (String.class == field.getType()) {
+                sql += " " + SQL_STRING_TYPE + "(40), ";
             }
         }
+        sql += "PRIMARY KEY(" + idName + "));";
+        executeSQLUpdate(connection, sql);
+    }
+
+    private void executeSQLUpdate(Connection connection, String sql) {
+        try {
+            Statement statement = connection.createStatement();
+            int result = statement.executeUpdate(sql);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private List<Field> getOrderedFieldsList(T entity) {
+
+        Field[] fields = entity.getClass().getDeclaredFields();
+        List<Field> orderedList = new ArrayList<Field>();
+
+        for (Field field : fields) {
+
+            Annotation[] annotations = field.getDeclaredAnnotations();
+            for (Annotation annotation : annotations) {
+                if (annotation.annotationType() == Id.class) {
+                    orderedList.add(0, field);
+                }
+                else{
+                    orderedList.add(field);
+                }
+            }
+        }
+        return orderedList;
     }
 
     public List<T> fetchAll(Statement statement) {
