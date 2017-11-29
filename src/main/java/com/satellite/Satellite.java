@@ -3,6 +3,7 @@ package com.satellite;
 import com.satellite.annotation.Id;
 import com.satellite.exception.ConnectionFailedException;
 import com.satellite.exception.NoConnectionOpenedException;
+import com.satellite.exception.NoEmptyConstructorException;
 import com.satellite.exception.NoIdAnnotationException;
 import com.sun.istack.internal.NotNull;
 
@@ -88,10 +89,7 @@ public class Satellite<T> {
         return insert(t);
     }
 
-    /**
-     * Recois toutes les informations de la BD
-     */
-    public void fetchAllByClass(Class classType) {
+    public void fetchAllByClass(Class classType) throws NoEmptyConstructorException{
         if(!fetchList.isEmpty()){
             fetchList = new ArrayList<T>();
         }

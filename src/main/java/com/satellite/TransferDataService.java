@@ -1,6 +1,7 @@
 package com.satellite;
 
 import com.satellite.annotation.Id;
+import com.satellite.exception.NoEmptyConstructorException;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
@@ -15,6 +16,7 @@ public class TransferDataService<T> {
 
     public static final String SQL_INTEGER_TYPE = "INT";
     public static final String SQL_STRING_TYPE = "VARCHAR";
+    public static final int AUCUN_ARGUMENT = 0;
     private static final String TABLE_NAME = "test";
 
     public void push(List<T> pendingList, Connection connection) throws Exception {
@@ -113,39 +115,40 @@ public class TransferDataService<T> {
         }
     }
 
-    public List<T> fetchAllByClass(Class classType, Connection connection) {
+    public List<T> fetchAllByClass(Class classType, Connection connection) throws NoEmptyConstructorException {
 
         String sql = "SELECT * FROM " + classType.getSimpleName();
         Field[] fields = classType.getDeclaredFields();
         List<T> list = new ArrayList<T>();
 
         try {
-            Statement statement = connection.createStatement();
-            ResultSet rs = statement.executeQuery(sql);
+            ResultSet rs = getResultSetQuery(connection, sql);
 
             while (rs.next()) {
-
                 T t = null;
-
                 Constructor[] constructors = classType.getDeclaredConstructors();
                 Method[] methods = classType.getDeclaredMethods();
 
                 for(Constructor constructor: constructors){
 
-                    if(0 == constructor.getParameterTypes().length){
+                    if(isEmptyConstructor(constructor)){
 
                         t = (T) constructor.newInstance();
 
                         for(Method method : methods){
-                            if("set".equals(method.getName().substring(0, 3).toLowerCase())){ ;
+                            if(isSetterMethod(method)){ ;
                                 for(Field field : fields){
-                                    if(method.getName().substring(3).toLowerCase().equals(field.getName().toLowerCase())){
+                                    if(methodNameIsEqualToFieldName(method, field)){
                                         method.invoke(t,  rs.getObject(field.getName()));
                                     }
                                 }
                             }
                         }
                         break;
+                    }
+                    //si aucun constructeur vide n'a été repéré pour instancier
+                    if(constructor.equals(constructors[constructors.length-1])){
+                        throw new  NoEmptyConstructorException();
                     }
                 }
                 if(null != t) {
@@ -156,6 +159,23 @@ public class TransferDataService<T> {
             e.printStackTrace();
         }
         return list;
+    }
+
+    private ResultSet getResultSetQuery(Connection connection, String sql) throws SQLException {
+        Statement statement = connection.createStatement();
+        return statement.executeQuery(sql);
+    }
+
+    private boolean isEmptyConstructor(Constructor constructor) {
+        return AUCUN_ARGUMENT == constructor.getParameterTypes().length;
+    }
+
+    private boolean isSetterMethod(Method method) {
+        return "set".equals(method.getName().substring(0, 3).toLowerCase());
+    }
+
+    private boolean methodNameIsEqualToFieldName(Method method, Field field) {
+        return method.getName().substring(3).toLowerCase().equals(field.getName().toLowerCase());
     }
 
     public Object buildOne(Class classType) throws InstantiationException, IllegalAccessException {
