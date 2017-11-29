@@ -13,7 +13,7 @@ import java.util.List;
 
 public class TransferService<T> {
 
-    public void push(List<T> pendingList, Connection connection) {
+    public void push(List<T> pendingList, Connection connection) throws IllegalAccessException {
 
         List<Field> fieldsList = new ArrayList<Field>();
 
@@ -32,16 +32,17 @@ public class TransferService<T> {
                 }
             }
 
-            String query = "insert into" + entity.getClass().getName() + "values(";
+            String query = "insert into " + entity.getClass().getSimpleName() + " values(";
 
             for(Field field : fieldsList){
                 if(fieldsList.size()-1 != fieldsList.indexOf(field)){
-                    query += field + ",";
+                    query += field.get(entity).toString() + ",";
                 }
                 else{
-                    query += field + ");";
+                    query += field.get(entity).toString() + ");";
                 }
             }
+            System.out.println(query);
 
             try {
                 Statement statement = connection.createStatement();

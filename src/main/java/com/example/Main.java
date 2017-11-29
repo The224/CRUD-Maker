@@ -3,7 +3,7 @@ package com.example;
 import com.satellite.Satellite;
 
 public class Main {
-    public static void main(String... args) {
+    public static void main(String... args) throws Exception{
         Satellite<UserExample> satellite = null;
 
         try {
@@ -17,8 +17,10 @@ public class Main {
         satellite.insert(new UserExample(3,"Tyrion", 56));
         satellite.insert(new UserExample(4,"Alec", 78));
 
-        satellite.push();
 
+
+        satellite.connect("localhost:3306/", "root", "");
+        satellite.push();
         satellite.findById(1);
 
     }

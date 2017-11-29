@@ -30,6 +30,7 @@ public class Satellite<T> {
         pendingList = new ArrayList<T>();
         fetchList = new ArrayList<T>();
         this.beanClass = beanClass;
+        connectionManager = new ConnectionManager();
     }
 
     public boolean insert(T obj) {
@@ -104,7 +105,7 @@ public class Satellite<T> {
     /**
      * Envoie les modifications de pendingList dans fetchList et la BD
      */
-    public void push() throws NoConnectionOpenedException {
+    public void push() throws Exception {
         Connection connection = connectionManager.getConnection();
 
         if(null != connection){
