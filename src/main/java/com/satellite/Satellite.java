@@ -89,11 +89,12 @@ public class Satellite<T> {
         return insert(t);
     }
 
-    public void fetchAllByClass(Class classType) throws NoEmptyConstructorException{
+    public Satellite fetchAllByClass(Class classType) throws NoEmptyConstructorException{
         if(!fetchList.isEmpty()){
             fetchList = new ArrayList<T>();
         }
         fetchList = transferService.fetchAllByClass(classType, connectionManager.getConnection());
+        return this;
     }
 
     /**

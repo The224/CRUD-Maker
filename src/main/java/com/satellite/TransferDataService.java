@@ -132,7 +132,6 @@ public class TransferDataService<T> {
                 for(Constructor constructor: constructors){
 
                     if(isEmptyConstructor(constructor)){
-
                         t = (T) constructor.newInstance();
 
                         for(Method method : methods){
@@ -148,7 +147,7 @@ public class TransferDataService<T> {
                     }
                     //si aucun constructeur vide n'a été repéré pour instancier
                     if(constructor.equals(constructors[constructors.length-1])){
-                        throw new  NoEmptyConstructorException();
+                        throw new NoEmptyConstructorException();
                     }
                 }
                 if(null != t) {

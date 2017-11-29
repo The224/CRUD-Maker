@@ -21,14 +21,12 @@ public class Main {
 
         satellite.connect("localhost", "3306", "testSatellite", "root", "");
         //satellite.push();
-        satellite.fetchAllByClass(UserExample.class);
-        List<UserExample> users = satellite.findAll();
+        List<UserExample> users = satellite.fetchAllByClass(UserExample.class).findAll();
 
         for(UserExample user : users){
             System.out.println(user.toString());
         }
         satellite.closeConnection();
         //satellite.findById(1);
-
     }
 }
