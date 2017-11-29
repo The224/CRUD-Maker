@@ -21,7 +21,8 @@ public class Main {
 
         satellite.connect("localhost", "3306", "testSatellite", "root", "");
         //satellite.push();
-        List<UserExample> users = satellite.fetchAll(UserExample.class);
+        satellite.fetchAllByClass(UserExample.class);
+        List<UserExample> users = satellite.findAll();
 
         for(UserExample user : users){
             System.out.println(user.toString());

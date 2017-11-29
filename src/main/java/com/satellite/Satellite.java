@@ -11,7 +11,6 @@ import java.lang.reflect.Field;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public class Satellite<T> {
@@ -93,8 +92,8 @@ public class Satellite<T> {
     /**
      * Recois toutes les informations de la BD
      */
-    public List<T> fetchAll(Class classType) {
-        return transferService.fetchAll(classType, connectionManager.getConnection());
+    public void fetchAllByClass(Class classType) {
+        fetchList = transferService.fetchAllByClass(classType, connectionManager.getConnection());
     }
 
     /**

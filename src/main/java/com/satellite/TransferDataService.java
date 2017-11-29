@@ -113,11 +113,11 @@ public class TransferDataService<T> {
         }
     }
 
-    public List<T> fetchAll(Class classType, Connection connection) {
+    public List<T> fetchAllByClass(Class classType, Connection connection) {
 
         String sql = "SELECT * FROM " + classType.getSimpleName();
         Field[] fields = classType.getDeclaredFields();
-        List<T> fetchList = new ArrayList<T>();
+        List<T> list = new ArrayList<T>();
 
         try {
             Statement statement = connection.createStatement();
@@ -149,13 +149,13 @@ public class TransferDataService<T> {
                     }
                 }
                 if(null != t) {
-                    fetchList.add(t);
+                    list.add(t);
                 }
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return fetchList;
+        return list;
     }
 
     public Object buildOne(Class classType) throws InstantiationException, IllegalAccessException {
