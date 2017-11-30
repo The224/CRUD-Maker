@@ -63,6 +63,10 @@ public class Satellite<T> {
         return null;
     }
 
+    public List<T> getPendingList() {
+        return pendingList;
+    }
+
     public List<T> findAll() {
         return fetchList;
     }
