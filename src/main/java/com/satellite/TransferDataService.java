@@ -16,7 +16,6 @@ public class TransferDataService<T> {
     public static final String SQL_INTEGER_TYPE = "INT";
     public static final String SQL_STRING_TYPE = "VARCHAR";
     public static final int AUCUN_ARGUMENT = 0;
-    private static final String TABLE_NAME = "test";
 
     public void push(List<T> pendingList, Connection connection) throws Exception {
 
@@ -32,14 +31,14 @@ public class TransferDataService<T> {
     private void persistEntityValues(Connection connection, T entity) throws IllegalAccessException {
 
         List<Field> fieldsList = getOrderedFieldsList(entity);
-        String sql = writeInsertInto(entity);
+        StringBuilder sql = new StringBuilder(writeInsertInto(entity));
 
         for (Field field : fieldsList) {
             field.setAccessible(true);
             String fieldValue = (String.class == field.getType()) ? "'" + field.get(entity).toString() + "'" : field.get(entity).toString();
-            sql += (fieldsList.size() - 1 != fieldsList.indexOf(field)) ? fieldValue + ", " : fieldValue + ");";
+            sql.append((fieldsList.size() - 1 != fieldsList.indexOf(field)) ? fieldValue + ", " : fieldValue + ");");
         }
-        executeSQLUpdate(connection, sql);
+        executeSQLUpdate(connection, sql.toString());
     }
 
     private String writeInsertInto(T entity) {
@@ -52,10 +51,10 @@ public class TransferDataService<T> {
         return tables.next();
     }
 
-    private void createSQLTableFromEntity(Connection connection, T entity) throws SQLException {
+    private void createSQLTableFromEntity(Connection connection, T entity){
 
         List<Field> fieldsList = getOrderedFieldsList(entity);
-        String sql = writeCreateTable(entity);
+        StringBuilder sql = new StringBuilder(writeCreateTable(entity));
         String idName = "";
 
         for (Field field : fieldsList) {
@@ -63,16 +62,16 @@ public class TransferDataService<T> {
             if (0 == fieldsList.indexOf(field)) {
                 idName = field.getName();
             }
-            sql += field.getName();
+            sql.append(field.getName());
 
             if (Integer.class == field.getType() || int.class == field.getType()) {
-                sql += " " + SQL_INTEGER_TYPE + ", ";
+                sql.append(" " + SQL_INTEGER_TYPE + ", ");
             } else if (String.class == field.getType()) {
-                sql += " " + SQL_STRING_TYPE + "(40), ";
+                sql.append(" " + SQL_STRING_TYPE + "(40), ");
             }
         }
-        sql += writePrimaryKey(idName);
-        executeSQLUpdate(connection, sql);
+        sql.append(writePrimaryKey(idName));
+        executeSQLUpdate(connection, sql.toString());
     }
 
     private String writeCreateTable(T entity) {
@@ -114,12 +113,12 @@ public class TransferDataService<T> {
         }
     }
 
-    public List<T> fetchAllByClass(Class classType, Connection connection) throws NoEmptyConstructorException {
+    public List<T> fetchAllByClass(Class classType, Connection connection){
         String sql = "SELECT * FROM " + classType.getSimpleName();
-        return fetchDataByQuery(classType, connection, sql);
+        return fetchEntitiesByQuery(classType, connection, sql);
     }
 
-    public List<T> fetchDataByQuery(Class classType, Connection connection, String sql) {
+    public List<T> fetchEntitiesByQuery(Class classType, Connection connection, String sql) {
         Field[] fields = classType.getDeclaredFields();
         List<T> list = new ArrayList<T>();
 
@@ -137,7 +136,7 @@ public class TransferDataService<T> {
                         t = (T) constructor.newInstance();
 
                         for(Method method : methods){
-                            if(isSetterMethod(method)){ ;
+                            if(isSetterMethod(method)){
                                 for(Field field : fields){
                                         if(methodNameIsEqualToFieldName(method, field)){
                                         method.invoke(t,  rs.getObject(field.getName()));

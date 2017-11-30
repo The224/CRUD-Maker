@@ -9,7 +9,7 @@ public class Main {
         Satellite<UserExample> satellite = null;
 
         try {
-            satellite = new Satellite<UserExample>(UserExample.class);
+            satellite = new Satellite<UserExample>();
         } catch (Exception e) {
             e.printStackTrace();
         }

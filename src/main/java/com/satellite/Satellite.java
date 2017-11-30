@@ -26,7 +26,7 @@ public class Satellite<T> {
 
     private ConnectionManager connectionManager;
 
-    public Satellite(Class beanClass) throws NoIdAnnotationException {
+    public Satellite() throws NoIdAnnotationException {
         pendingList = new ArrayList<T>();
         fetchList = new ArrayList<T>();
         connectionManager = new ConnectionManager();
@@ -102,7 +102,7 @@ public class Satellite<T> {
             fetchList = new ArrayList<T>();
         }
         String sql = "select * from " + classType.getSimpleName() + " where " + condition + ";";
-        fetchList = transferDataService.fetchDataByQuery(classType, connectionManager.getConnection(), sql);
+        fetchList = transferDataService.fetchEntitiesByQuery(classType, connectionManager.getConnection(), sql);
         return this;
     }
 
@@ -111,7 +111,7 @@ public class Satellite<T> {
             fetchList = new ArrayList<T>();
         }
         String sql = "select * from " + classType.getSimpleName() + " where id = " + id + ";";
-        fetchList = transferDataService.fetchDataByQuery(classType, connectionManager.getConnection(), sql);
+        fetchList = transferDataService.fetchEntitiesByQuery(classType, connectionManager.getConnection(), sql);
         return this;
     }
 
