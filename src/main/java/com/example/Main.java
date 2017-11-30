@@ -23,12 +23,14 @@ public class Main {
         //satellite.push();
         List<UserExample> users = satellite.fetchAllByClass(UserExample.class).findAll();
 
-        List<UserExample> user01 = satellite.fetchAllByCondition(UserExample.class, "id = 3").findAll();
+        List<UserExample> user01 = satellite.fetchAllByCondition(UserExample.class, "name = 'Karla'").findAll();
+        List<UserExample> user02 = satellite.fetchById(UserExample.class, 4).findAll();
 
         for(UserExample user : users){
             System.out.println(user.toString());
         }
         System.out.println(user01);
+        System.out.println(user02);
         satellite.closeConnection();
         //satellite.findById(1);
     }
