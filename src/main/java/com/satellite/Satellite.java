@@ -43,11 +43,16 @@ public class Satellite<T> {
         return true;
     }
 
-    public void connect(String hostName, String port, String database, String user, String password) throws ConnectionFailedException {
+    public Boolean connect(String hostName, String port, String database, String user, String password) throws ConnectionFailedException {
         String url = "jdbc:mysql://" + hostName + ":" + port + "/" + database;
         if (null == connectionManager.connect(url, user, password)) {
             throw new ConnectionFailedException();
         }
+        return true;
+    }
+
+    public Boolean isConnected(){
+        return null != connectionManager.getConnection();
     }
 
     public void closeConnection() throws SQLException {
@@ -94,26 +99,17 @@ public class Satellite<T> {
     }
 
     public Satellite fetchAllByClass(Class classType) throws NoEmptyConstructorException{
-        if(!fetchList.isEmpty()){
-            fetchList = new ArrayList<T>();
-        }
         fetchList = transferDataService.fetchAllByClass(classType, connectionManager.getConnection());
         return this;
     }
 
     public Satellite fetchAllByCondition(Class classType, String condition) {
-        if(!fetchList.isEmpty()){
-            fetchList = new ArrayList<T>();
-        }
         String sql = "select * from " + classType.getSimpleName() + " where " + condition + ";";
         fetchList = transferDataService.fetchEntitiesByQuery(classType, connectionManager.getConnection(), sql);
         return this;
     }
 
     public Satellite fetchById(Class classType, int id){
-        if(!fetchList.isEmpty()){
-            fetchList = new ArrayList<T>();
-        }
         String sql = "select * from " + classType.getSimpleName() + " where id = " + id + ";";
         fetchList = transferDataService.fetchEntitiesByQuery(classType, connectionManager.getConnection(), sql);
         return this;
