@@ -31,7 +31,7 @@ public class Satellite {
         pendingList = new ArrayList();
         fetchList = new ArrayList();
         connectionManager = new ConnectionManager();
-        transferDataService = new TransferDataService();
+        transferDataService = new TransferDataService(connectionManager.getConnection());
     }
 
     public static Satellite getInstance() throws Exception{

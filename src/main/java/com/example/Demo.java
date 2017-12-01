@@ -30,12 +30,16 @@ public class Demo {
         List<User> user01 = (List<User>) satellite.fetchAllByCondition(User.class, "name = 'Karla'").findAll();
         List<User> user02 = (List<User>) satellite.fetchById(User.class, 4).findAll();
 
+        satellite.closeConnection();
+
+
         for(User user : users){
             System.out.println(user.toString());
         }
         System.out.println(user01);
         System.out.println(user02);
-        satellite.closeConnection();
+
         //satellite.findById(1);
+
     }
 }

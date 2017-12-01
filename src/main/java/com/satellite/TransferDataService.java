@@ -123,40 +123,27 @@ public class TransferDataService {
 
     public List<?> fetchEntitiesByQuery(Class classType, String sql) {
         Field[] fields = classType.getDeclaredFields();
+        Method[] methods = classType.getDeclaredMethods();
+
         List<Object> list = new ArrayList();
 
         try {
             ResultSet rs = getResultSetQuery(sql);
+            Constructor constructor = getEmptyConstructor(classType);
 
             while (rs.next()) {
-                Object t = null;
-                Constructor[] constructors = classType.getDeclaredConstructors();
-                Method[] methods = classType.getDeclaredMethods();
+                Object t = constructor.newInstance();
 
-                for(Constructor constructor: constructors){
-
-                    if(isEmptyConstructor(constructor)){
-                        t = (Object) constructor.newInstance();
-
-                        for(Method method : methods){
-                            if(isSetterMethod(method)){
-                                for(Field field : fields){
-                                        if(isMethodNameIsEqualToFieldName(method, field)){
-                                        method.invoke(t,  rs.getObject(field.getName()));
-                                    }
-                                }
+                for(Method method : methods){
+                    if(isSetterMethod(method)){
+                        for(Field field : fields){
+                            if(isMethodNameIsEqualToFieldName(method, field)){
+                                method.invoke(t,  rs.getObject(field.getName()));
                             }
                         }
-                        break;
-                    }
-                    //si aucun constructeur vide n'a été repéré pour instancier
-                    if(constructor.equals(constructors[constructors.length-1])){
-                        throw new NoEmptyConstructorException();
                     }
                 }
-                if(null != t) {
-                    list.add((Object)t);
-                }
+                list.add(t);
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -164,13 +151,22 @@ public class TransferDataService {
         return list;
     }
 
+    /**
+     * @param classType
+     * @return Le constructor sans paramettre
+     * @throws NoEmptyConstructorException
+     */
+    private Constructor getEmptyConstructor(Class classType) throws NoEmptyConstructorException {
+        for(Constructor constructor: classType.getDeclaredConstructors()){
+            if (AUCUN_ARGUMENT == constructor.getParameterTypes().length)
+                return constructor;
+        }
+        throw new NoEmptyConstructorException();
+    }
+
     private ResultSet getResultSetQuery(String sql) throws SQLException {
         Statement statement = connection.createStatement();
         return statement.executeQuery(sql);
-    }
-
-    private boolean isEmptyConstructor(Constructor constructor) {
-        return AUCUN_ARGUMENT == constructor.getParameterTypes().length;
     }
 
     private boolean isSetterMethod(Method method) {
