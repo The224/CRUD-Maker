@@ -113,19 +113,19 @@ public class Satellite {
     }
 
     public Satellite fetchAllByClass(Class classType) throws NoEmptyConstructorException{
-        fetchList = (List<Object>) transferDataService.fetchAllByClass(classType, connectionManager.getConnection());
+        fetchList = (List<Object>) transferDataService.fetchAllByClass(classType);
         return this;
     }
 
     public Satellite fetchAllByCondition(Class classType, String condition) {
         String sql = "select * from " + classType.getSimpleName() + " where " + condition + ";";
-        fetchList = (List<Object>) transferDataService.fetchEntitiesByQuery(classType, connectionManager.getConnection(), sql);
+        fetchList = (List<Object>) transferDataService.fetchEntitiesByQuery(classType, sql);
         return this;
     }
 
     public Satellite fetchById(Class classType, int id){
         String sql = "select * from " + classType.getSimpleName() + " where id = " + id + ";";
-        fetchList = (List<Object>) transferDataService.fetchEntitiesByQuery(classType, connectionManager.getConnection(), sql);
+        fetchList = (List<Object>) transferDataService.fetchEntitiesByQuery(classType, sql);
         return this;
     }
 
@@ -140,7 +140,7 @@ public class Satellite {
         Connection connection = connectionManager.getConnection();
 
         if (null != connection) {
-            transferDataService.push(pendingList, connectionManager.getConnection());
+            transferDataService.push(pendingList);
         } else {
             throw new NoConnectionOpenedException();
         }
