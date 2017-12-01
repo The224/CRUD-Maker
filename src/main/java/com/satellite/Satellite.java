@@ -42,9 +42,15 @@ public class Satellite {
     }
 
     public boolean insert(Object obj) {
+        for (Object t : fetchList)
+            if (getIdValue(t).equals(getIdValue(obj))) {
+                System.out.println("fetchList : Un objet avec le meme id existe deja !");
+                return false;
+            }
+
         for (Object t : pendingList)
             if (getIdValue(t).equals(getIdValue(obj))) {
-                System.out.println("Un objet avec le meme id existe deja !");
+                System.out.println("pendingList : Un objet avec le meme id existe deja !");
                 return false;
             }
         pendingList.add(obj);
@@ -160,21 +166,4 @@ public class Satellite {
         }
         return null;
     }
-
-    /*public void printClassInformation() {
-        try {
-            for (Field field : beanClass.getDeclaredFields()) {
-                Class type = field.getType();
-                String name = field.getName();
-                Annotation[] annotations = field.getDeclaredAnnotations();
-
-                System.out.println(type);
-                System.out.println(name);
-
-                System.out.println(Arrays.toString(annotations));
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }*/
 }

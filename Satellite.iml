@@ -15,5 +15,6 @@
     <orderEntry type="library" name="Maven: mysql:mysql-connector-java:5.1.45" level="project" />
     <orderEntry type="library" name="Maven: com.jcraft:jsch:0.1.53" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.assertj:assertj-core:3.8.0" level="project" />
+    <orderEntry type="library" name="Maven: org.jetbrains:annotations-java5:15.0" level="project" />
   </component>
 </module>

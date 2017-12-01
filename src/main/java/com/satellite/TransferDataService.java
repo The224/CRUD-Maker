@@ -13,23 +13,26 @@ import java.util.List;
 
 public class TransferDataService {
 
-    public static final String SQL_INTEGER_TYPE = "INT";
-    public static final String SQL_STRING_TYPE = "VARCHAR";
-    public static final int AUCUN_ARGUMENT = 0;
+    private static final String SQL_INTEGER_TYPE = "INT";
+    private static final String SQL_STRING_TYPE = "VARCHAR";
+    private static final int AUCUN_ARGUMENT = 0;
 
     public void push(List<?> pendingList, Connection connection) throws Exception {
 
-        for (Object entity : pendingList) {
-
-            if (!entityTableExists(connection, entity)) {
-                createSQLTableFromEntity(connection, entity);
+        // Verifier que la table existe dans la DB
+        if (!pendingList.isEmpty()) {
+            if (!entityTableExists(connection, pendingList.get(0).getClass())) {
+                createSQLTableFromEntity(connection, pendingList.get(0));
             }
+        }
+
+        // Persit les donnees
+        for (Object entity : pendingList) {
             persistEntityValues(connection, entity);
         }
     }
 
     private void persistEntityValues(Connection connection, Object entity) throws IllegalAccessException {
-
         List<Field> fieldsList = getOrderedFieldsList(entity);
         StringBuilder sql = new StringBuilder(writeInsertInto(entity));
 
@@ -45,9 +48,9 @@ public class TransferDataService {
         return "insert into " + entity.getClass().getSimpleName() + " values(";
     }
 
-    private Boolean entityTableExists(Connection connection, Object entity) throws SQLException {
+    private Boolean entityTableExists(Connection connection, Class entityClass) throws SQLException {
         DatabaseMetaData metaData = connection.getMetaData();
-        ResultSet tables = metaData.getTables(null, null, entity.getClass().getSimpleName(), null);
+        ResultSet tables = metaData.getTables(null, null, entityClass.getSimpleName(), null);
         return tables.next();
     }
 
@@ -180,13 +183,5 @@ public class TransferDataService {
 
     private boolean methodNameIsEqualToFieldName(Method method, Field field) {
         return method.getName().substring(3).toLowerCase().equals(field.getName().toLowerCase());
-    }
-
-    public Object buildOne(Class classType) throws InstantiationException, IllegalAccessException {
-        return classType.newInstance();
-    }
-
-    public void fetchByQuery(String query) {
-
     }
 }
