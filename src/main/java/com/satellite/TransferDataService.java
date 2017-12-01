@@ -17,47 +17,50 @@ public class TransferDataService {
     private static final String SQL_STRING_TYPE = "VARCHAR";
     private static final int AUCUN_ARGUMENT = 0;
 
-    public void push(List<?> pendingList, Connection connection) throws Exception {
+    private static Connection connection;
 
-        // Verifier que la table existe dans la DB
-        if (!pendingList.isEmpty()) {
-            if (!entityTableExists(connection, pendingList.get(0).getClass())) {
-                createSQLTableFromEntity(connection, pendingList.get(0));
-            }
-        }
+    public TransferDataService(Connection connection) {
+        this.connection = connection;
+    }
 
-        // Persit les donnees
+    public void push(List<?> pendingList) throws Exception {
         for (Object entity : pendingList) {
-            persistEntityValues(connection, entity);
+            // Verifier que la table existe dans la DB
+            // Dans la boucle pour chaque type different
+            if (!entityTableExists(pendingList.get(0).getClass())) {
+                createSQLTableFromEntity(pendingList.get(0));
+            }
+            persistEntityValues(entity);
         }
     }
 
-    private void persistEntityValues(Connection connection, Object entity) throws IllegalAccessException {
+    private void persistEntityValues(Object entity) throws IllegalAccessException {
         List<Field> fieldsList = getOrderedFieldsList(entity);
-        StringBuilder sql = new StringBuilder(writeInsertInto(entity));
+        StringBuilder sql = new StringBuilder(SQLUtils.writeInsertInto(entity));
 
         for (Field field : fieldsList) {
             field.setAccessible(true);
+            // TODO : A voir !!!!
             String fieldValue = (String.class == field.getType()) ? "'" + field.get(entity).toString() + "'" : field.get(entity).toString();
+
+            // Detecte le dernier element
             sql.append((fieldsList.size() - 1 != fieldsList.indexOf(field)) ? fieldValue + ", " : fieldValue + ");");
         }
-        executeSQLUpdate(connection, sql.toString());
+        executeSQLUpdate(sql.toString());
     }
 
-    private String writeInsertInto(Object entity) {
-        return "insert into " + entity.getClass().getSimpleName() + " values(";
-    }
 
-    private Boolean entityTableExists(Connection connection, Class entityClass) throws SQLException {
+
+    private Boolean entityTableExists(Class entityClass) throws SQLException {
         DatabaseMetaData metaData = connection.getMetaData();
         ResultSet tables = metaData.getTables(null, null, entityClass.getSimpleName(), null);
         return tables.next();
     }
 
-    private void createSQLTableFromEntity(Connection connection, Object entity){
+    private void createSQLTableFromEntity(Object entity){
 
         List<Field> fieldsList = getOrderedFieldsList(entity);
-        StringBuilder sql = new StringBuilder(writeCreateTable(entity));
+        StringBuilder sql = new StringBuilder(SQLUtils.writeCreateTable(entity));
         String idName = "";
 
         for (Field field : fieldsList) {
@@ -73,19 +76,12 @@ public class TransferDataService {
                 sql.append(" " + SQL_STRING_TYPE + "(40), ");
             }
         }
-        sql.append(writePrimaryKey(idName));
-        executeSQLUpdate(connection, sql.toString());
+        sql.append(SQLUtils.writePrimaryKey(idName));
+        executeSQLUpdate(sql.toString());
     }
 
-    private String writeCreateTable(Object entity) {
-        return "create table " + entity.getClass().getSimpleName() + "(";
-    }
 
-    private String writePrimaryKey(String idName) {
-        return "PRIMARY KEY(" + idName + "));";
-    }
-
-    private void executeSQLUpdate(Connection connection, String sql) {
+    private void executeSQLUpdate(String sql) {
         try {
             Statement statement = connection.createStatement();
             int result = statement.executeUpdate(sql);
@@ -120,17 +116,17 @@ public class TransferDataService {
         }
     }
 
-    public List<?> fetchAllByClass(Class classType, Connection connection){
+    public List<?> fetchAllByClass(Class classType){
         String sql = "SELECT * FROM " + classType.getSimpleName();
-        return fetchEntitiesByQuery(classType, connection, sql);
+        return fetchEntitiesByQuery(classType, sql);
     }
 
-    public List<?> fetchEntitiesByQuery(Class classType, Connection connection, String sql) {
+    public List<?> fetchEntitiesByQuery(Class classType, String sql) {
         Field[] fields = classType.getDeclaredFields();
         List<Object> list = new ArrayList();
 
         try {
-            ResultSet rs = getResultSetQuery(connection, sql);
+            ResultSet rs = getResultSetQuery(sql);
 
             while (rs.next()) {
                 Object t = null;
@@ -145,7 +141,7 @@ public class TransferDataService {
                         for(Method method : methods){
                             if(isSetterMethod(method)){
                                 for(Field field : fields){
-                                        if(methodNameIsEqualToFieldName(method, field)){
+                                        if(isMethodNameIsEqualToFieldName(method, field)){
                                         method.invoke(t,  rs.getObject(field.getName()));
                                     }
                                 }
@@ -168,7 +164,7 @@ public class TransferDataService {
         return list;
     }
 
-    private ResultSet getResultSetQuery(Connection connection, String sql) throws SQLException {
+    private ResultSet getResultSetQuery(String sql) throws SQLException {
         Statement statement = connection.createStatement();
         return statement.executeQuery(sql);
     }
@@ -181,7 +177,7 @@ public class TransferDataService {
         return "set".equals(method.getName().substring(0, 3).toLowerCase());
     }
 
-    private boolean methodNameIsEqualToFieldName(Method method, Field field) {
+    private boolean isMethodNameIsEqualToFieldName(Method method, Field field) {
         return method.getName().substring(3).toLowerCase().equals(field.getName().toLowerCase());
     }
 }
