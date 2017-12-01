@@ -104,6 +104,10 @@ public class TransferDataService {
 
     private void addToFieldsListInOrder(List<Field> orderedList, Field field) {
         Annotation[] annotations = field.getDeclaredAnnotations();
+
+        if (annotations.length == 0)
+            orderedList.add(field);
+
         for (Annotation annotation : annotations) {
             if (annotation.annotationType() == Id.class) {
                 orderedList.add(0, field);
