@@ -19,6 +19,10 @@ public class Demo {
         satellite.insert(new User(15,"Tyrion", 56));
         satellite.insert(new User(16,"Alec", 78));
 
+        satellite.insert(new Pays("Canada", 36048521, "A mari usque ad mare", "Ottawa"));
+        satellite.insert(new Pays("France", 67595000, "Liberté, Égalité, Fraternité", "Paris"));
+        satellite.insert(new Pays("Angleterre", 55012456, "Dieu et mon droit", "Londres"));
+
         satellite.connect("localhost", "3306", "testSatellite", "root", "toor");
         satellite.push();
         List<User> users = (List<User>) satellite.fetchAllByClass(User.class).findAll();
