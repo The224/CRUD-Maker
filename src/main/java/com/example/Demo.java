@@ -4,7 +4,7 @@ import com.satellite.Satellite;
 
 import java.util.List;
 
-public class Main {
+public class Demo {
     public static void main(String... args) throws Exception{
         Satellite satellite = null;
 
