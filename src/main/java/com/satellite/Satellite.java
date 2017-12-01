@@ -27,7 +27,7 @@ public class Satellite {
 
     private ConnectionManager connectionManager;
 
-    private Satellite() throws NoIdAnnotationException {
+    public Satellite() throws NoIdAnnotationException {
         pendingList = new ArrayList();
         fetchList = new ArrayList();
         connectionManager = new ConnectionManager();

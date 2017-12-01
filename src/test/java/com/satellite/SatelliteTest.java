@@ -1,7 +1,6 @@
 package com.satellite;
 
-import com.example.UserExample;
-import com.satellite.annotation.Id;
+import com.example.User;
 import com.satellite.exception.ConnectionFailedException;
 import org.assertj.core.api.ThrowableAssert;
 import org.junit.After;
@@ -12,19 +11,17 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.*;
 
-import static org.junit.Assert.*;
-
 public class SatelliteTest {
 
     Satellite satellite;
-    UserExample user01;
-    UserExample user02;
+    User user01;
+    User user02;
 
     @Before
     public void setUp() throws Exception {
         satellite = Satellite.getInstance();
-        user01 = new UserExample(60, "Maya", 28);
-        user02 = new UserExample(65, "Nicolas", 34);
+        user01 = new User(60, "Maya", 28);
+        user02 = new User(65, "Nicolas", 34);
 
     }
 
@@ -82,7 +79,7 @@ public class SatelliteTest {
         satellite.connect("localhost", "3306", "testSatellite", "root", "");
         satellite.insert(user02);
         satellite.push();
-        List<Object> oneItemList = (List<Object>) satellite.fetchById(UserExample.class, user02.getId()).findAll();
+        List<Object> oneItemList = (List<Object>) satellite.fetchById(User.class, user02.getId()).findAll();
 
         assertThat(emptyList).isEmpty();
         assertThat(oneItemList).hasSize(1);
@@ -91,7 +88,7 @@ public class SatelliteTest {
     @Test
     public void testRemove() throws Exception {
         satellite.connect("localhost", "3306", "testSatellite", "root", "");
-        satellite.fetchAllByClass(UserExample.class).findAll();
+        satellite.fetchAllByClass(User.class).findAll();
 
         assertThat(satellite.findById(65)).isNotNull();
         satellite.remove(65);

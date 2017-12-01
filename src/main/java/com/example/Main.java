@@ -14,19 +14,19 @@ public class Main {
             e.printStackTrace();
         }
 
-        satellite.insert(new UserExample(13,"Gabriel", 90));
-        satellite.insert(new UserExample(14,"Karla", 34));
-        satellite.insert(new UserExample(15,"Tyrion", 56));
-        satellite.insert(new UserExample(16,"Alec", 78));
+        satellite.insert(new User(13,"Gabriel", 90));
+        satellite.insert(new User(14,"Karla", 34));
+        satellite.insert(new User(15,"Tyrion", 56));
+        satellite.insert(new User(16,"Alec", 78));
 
         satellite.connect("localhost", "3306", "testSatellite", "root", "");
         //satellite.push();
-        List<UserExample> users = (List<UserExample>) satellite.fetchAllByClass(UserExample.class).findAll();
+        List<User> users = (List<User>) satellite.fetchAllByClass(User.class).findAll();
 
-        List<UserExample> user01 = (List<UserExample>) satellite.fetchAllByCondition(UserExample.class, "name = 'Karla'").findAll();
-        List<UserExample> user02 = (List<UserExample>) satellite.fetchById(UserExample.class, 4).findAll();
+        List<User> user01 = (List<User>) satellite.fetchAllByCondition(User.class, "name = 'Karla'").findAll();
+        List<User> user02 = (List<User>) satellite.fetchById(User.class, 4).findAll();
 
-        for(UserExample user : users){
+        for(User user : users){
             System.out.println(user.toString());
         }
         System.out.println(user01);

@@ -2,22 +2,18 @@ package com.example;
 
 import com.satellite.annotation.Id;
 
-import javax.persistence.Column;
-
-public class UserExample {
+public class User {
 
     @Id
     private Integer id;
-    @Column(name = "NAME")
     private String name;
-    @Column(name = "AGE")
     private int age;
 
-    public UserExample(){
+    public User(){
 
     }
 
-    public UserExample(int id, String name, int age) {
+    public User(int id, String name, int age) {
         this.name = name;
         this.age = age;
         this.id = id;
@@ -49,7 +45,7 @@ public class UserExample {
 
     @Override
     public String toString() {
-        return "UserExample{" +
+        return "User{" +
                 "id=" + id +
                 ", name='" + name + '\'' +
                 ", age=" + age +
