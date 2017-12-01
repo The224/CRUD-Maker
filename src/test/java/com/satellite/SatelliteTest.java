@@ -22,7 +22,7 @@ public class SatelliteTest {
 
     @Before
     public void setUp() throws Exception {
-        satellite = new Satellite();
+        satellite = Satellite.getInstance();
         user01 = new UserExample(60, "Maya", 28);
         user02 = new UserExample(65, "Nicolas", 34);
 
@@ -78,11 +78,11 @@ public class SatelliteTest {
 
     @Test
     public void testFindAll() throws Exception {
-        List<Object> emptyList = satellite.fetchAllByClass(Integer.class).findAll();
+        List<Object> emptyList = (List<Object>) satellite.fetchAllByClass(Integer.class).findAll();
         satellite.connect("localhost", "3306", "testSatellite", "root", "");
         satellite.insert(user02);
         satellite.push();
-        List<Object> oneItemList = satellite.fetchById(UserExample.class, user02.getId()).findAll();
+        List<Object> oneItemList = (List<Object>) satellite.fetchById(UserExample.class, user02.getId()).findAll();
 
         assertThat(emptyList).isEmpty();
         assertThat(oneItemList).hasSize(1);

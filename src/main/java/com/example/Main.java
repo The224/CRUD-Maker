@@ -6,25 +6,25 @@ import java.util.List;
 
 public class Main {
     public static void main(String... args) throws Exception{
-        Satellite<UserExample> satellite = null;
+        Satellite satellite = null;
 
         try {
-            satellite = new Satellite<UserExample>();
+            satellite = Satellite.getInstance();
         } catch (Exception e) {
             e.printStackTrace();
         }
 
-        satellite.insert(new UserExample(9,"Gabriel", 90));
-        satellite.insert(new UserExample(10,"Karla", 34));
-        satellite.insert(new UserExample(11,"Tyrion", 56));
-        satellite.insert(new UserExample(12,"Alec", 78));
+        satellite.insert(new UserExample(13,"Gabriel", 90));
+        satellite.insert(new UserExample(14,"Karla", 34));
+        satellite.insert(new UserExample(15,"Tyrion", 56));
+        satellite.insert(new UserExample(16,"Alec", 78));
 
         satellite.connect("localhost", "3306", "testSatellite", "root", "");
         //satellite.push();
-        List<UserExample> users = satellite.fetchAllByClass(UserExample.class).findAll();
+        List<UserExample> users = (List<UserExample>) satellite.fetchAllByClass(UserExample.class).findAll();
 
-        List<UserExample> user01 = satellite.fetchAllByCondition(UserExample.class, "name = 'Karla'").findAll();
-        List<UserExample> user02 = satellite.fetchById(UserExample.class, 4).findAll();
+        List<UserExample> user01 = (List<UserExample>) satellite.fetchAllByCondition(UserExample.class, "name = 'Karla'").findAll();
+        List<UserExample> user02 = (List<UserExample>) satellite.fetchById(UserExample.class, 4).findAll();
 
         for(UserExample user : users){
             System.out.println(user.toString());

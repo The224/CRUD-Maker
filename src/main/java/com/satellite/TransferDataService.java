@@ -11,15 +11,15 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class TransferDataService<T> {
+public class TransferDataService {
 
     public static final String SQL_INTEGER_TYPE = "INT";
     public static final String SQL_STRING_TYPE = "VARCHAR";
     public static final int AUCUN_ARGUMENT = 0;
 
-    public void push(List<T> pendingList, Connection connection) throws Exception {
+    public void push(List<?> pendingList, Connection connection) throws Exception {
 
-        for (T entity : pendingList) {
+        for (Object entity : pendingList) {
 
             if (!entityTableExists(connection, entity)) {
                 createSQLTableFromEntity(connection, entity);
@@ -28,7 +28,7 @@ public class TransferDataService<T> {
         }
     }
 
-    private void persistEntityValues(Connection connection, T entity) throws IllegalAccessException {
+    private void persistEntityValues(Connection connection, Object entity) throws IllegalAccessException {
 
         List<Field> fieldsList = getOrderedFieldsList(entity);
         StringBuilder sql = new StringBuilder(writeInsertInto(entity));
@@ -41,17 +41,17 @@ public class TransferDataService<T> {
         executeSQLUpdate(connection, sql.toString());
     }
 
-    private String writeInsertInto(T entity) {
+    private String writeInsertInto(Object entity) {
         return "insert into " + entity.getClass().getSimpleName() + " values(";
     }
 
-    private Boolean entityTableExists(Connection connection, T entity) throws SQLException {
+    private Boolean entityTableExists(Connection connection, Object entity) throws SQLException {
         DatabaseMetaData metaData = connection.getMetaData();
         ResultSet tables = metaData.getTables(null, null, entity.getClass().getSimpleName(), null);
         return tables.next();
     }
 
-    private void createSQLTableFromEntity(Connection connection, T entity){
+    private void createSQLTableFromEntity(Connection connection, Object entity){
 
         List<Field> fieldsList = getOrderedFieldsList(entity);
         StringBuilder sql = new StringBuilder(writeCreateTable(entity));
@@ -74,7 +74,7 @@ public class TransferDataService<T> {
         executeSQLUpdate(connection, sql.toString());
     }
 
-    private String writeCreateTable(T entity) {
+    private String writeCreateTable(Object entity) {
         return "create table " + entity.getClass().getSimpleName() + "(";
     }
 
@@ -91,7 +91,7 @@ public class TransferDataService<T> {
         }
     }
 
-    private List<Field> getOrderedFieldsList(T entity) {
+    private List<Field> getOrderedFieldsList(Object entity) {
 
         Field[] fields = entity.getClass().getDeclaredFields();
         List<Field> orderedList = new ArrayList<Field>();
@@ -113,27 +113,27 @@ public class TransferDataService<T> {
         }
     }
 
-    public List<T> fetchAllByClass(Class classType, Connection connection){
+    public List<?> fetchAllByClass(Class classType, Connection connection){
         String sql = "SELECT * FROM " + classType.getSimpleName();
         return fetchEntitiesByQuery(classType, connection, sql);
     }
 
-    public List<T> fetchEntitiesByQuery(Class classType, Connection connection, String sql) {
+    public List<?> fetchEntitiesByQuery(Class classType, Connection connection, String sql) {
         Field[] fields = classType.getDeclaredFields();
-        List<T> list = new ArrayList<T>();
+        List<Object> list = new ArrayList();
 
         try {
             ResultSet rs = getResultSetQuery(connection, sql);
 
             while (rs.next()) {
-                T t = null;
+                Object t = null;
                 Constructor[] constructors = classType.getDeclaredConstructors();
                 Method[] methods = classType.getDeclaredMethods();
 
                 for(Constructor constructor: constructors){
 
                     if(isEmptyConstructor(constructor)){
-                        t = (T) constructor.newInstance();
+                        t = (Object) constructor.newInstance();
 
                         for(Method method : methods){
                             if(isSetterMethod(method)){
@@ -152,7 +152,7 @@ public class TransferDataService<T> {
                     }
                 }
                 if(null != t) {
-                    list.add(t);
+                    list.add((Object)t);
                 }
             }
         } catch (Exception e) {

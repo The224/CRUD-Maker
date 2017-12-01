@@ -14,27 +14,35 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Satellite<T> {
+public class Satellite {
     // Liste de la BD
-    private List<T> fetchList;
+    private List<Object> fetchList;
     // Liste des modification qui ne sont pas dans la BD
-    private List<T> pendingList;
+    private List<Object> pendingList;
     // Class du generic
     //private Class beanClass;
+    private static Satellite satellite;
 
     private TransferDataService transferDataService;
 
     private ConnectionManager connectionManager;
 
-    public Satellite() throws NoIdAnnotationException {
-        pendingList = new ArrayList<T>();
-        fetchList = new ArrayList<T>();
+    private Satellite() throws NoIdAnnotationException {
+        pendingList = new ArrayList();
+        fetchList = new ArrayList();
         connectionManager = new ConnectionManager();
         transferDataService = new TransferDataService();
     }
 
-    public boolean insert(T obj) {
-        for (T t : pendingList)
+    public static Satellite getInstance() throws Exception{
+        if(null == satellite){
+            satellite = new Satellite();
+        }
+        return satellite;
+    }
+
+    public boolean insert(Object obj) {
+        for (Object t : pendingList)
             if (getIdValue(t).equals(getIdValue(obj))) {
                 System.out.println("Un objet avec le meme id existe deja !");
                 return false;
@@ -59,8 +67,8 @@ public class Satellite<T> {
         connectionManager.close();
     }
 
-    public T findById(@NotNull Object id) {
-        for (T t : fetchList) {
+    public Object findById(@NotNull Object id) {
+        for (Object t : fetchList) {
             if (getIdValue(t).equals(id)) {
                 return t;
             }
@@ -68,23 +76,23 @@ public class Satellite<T> {
         return null;
     }
 
-    public List<T> getPendingList() {
+    public List<?> getPendingList() {
         return pendingList;
     }
 
-    public List<T> findAll() {
+    public List<?> findAll() {
         return fetchList;
     }
 
     public boolean remove(@NotNull Object id) {
-        for (T t : fetchList) {
+        for (Object t : fetchList) {
             if (getIdValue(t).equals(id)) {
                 fetchList.remove(t);
                 return true;
             }
         }
         // TODO : A voir !!!!
-        for (T t : pendingList) {
+        for (Object t : pendingList) {
             if (getIdValue(t).equals(id)) {
                 pendingList.remove(t);
                 return true;
@@ -93,25 +101,25 @@ public class Satellite<T> {
         return false;
     }
 
-    public boolean update(@NotNull Object id, T t) {
+    public boolean update(@NotNull Object id, Object t) {
         remove(id); // The lazy way !
         return insert(t);
     }
 
     public Satellite fetchAllByClass(Class classType) throws NoEmptyConstructorException{
-        fetchList = transferDataService.fetchAllByClass(classType, connectionManager.getConnection());
+        fetchList = (List<Object>) transferDataService.fetchAllByClass(classType, connectionManager.getConnection());
         return this;
     }
 
     public Satellite fetchAllByCondition(Class classType, String condition) {
         String sql = "select * from " + classType.getSimpleName() + " where " + condition + ";";
-        fetchList = transferDataService.fetchEntitiesByQuery(classType, connectionManager.getConnection(), sql);
+        fetchList = (List<Object>) transferDataService.fetchEntitiesByQuery(classType, connectionManager.getConnection(), sql);
         return this;
     }
 
     public Satellite fetchById(Class classType, int id){
         String sql = "select * from " + classType.getSimpleName() + " where id = " + id + ";";
-        fetchList = transferDataService.fetchEntitiesByQuery(classType, connectionManager.getConnection(), sql);
+        fetchList = (List<Object>) transferDataService.fetchEntitiesByQuery(classType, connectionManager.getConnection(), sql);
         return this;
     }
 
@@ -132,10 +140,10 @@ public class Satellite<T> {
         }
 
         fetchList.addAll(pendingList);
-        pendingList = new ArrayList<T>();
+        pendingList = new ArrayList();
     }
 
-    private Object getIdValue(T t) {
+    private Object getIdValue(Object t) {
 
         try {
             for (Field field : t.getClass().getDeclaredFields()) {
