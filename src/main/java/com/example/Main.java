@@ -19,8 +19,8 @@ public class Main {
         satellite.insert(new User(15,"Tyrion", 56));
         satellite.insert(new User(16,"Alec", 78));
 
-        satellite.connect("localhost", "3306", "testSatellite", "root", "");
-        //satellite.push();
+        satellite.connect("localhost", "3306", "testSatellite", "root", "toor");
+        satellite.push();
         List<User> users = (List<User>) satellite.fetchAllByClass(User.class).findAll();
 
         List<User> user01 = (List<User>) satellite.fetchAllByCondition(User.class, "name = 'Karla'").findAll();
