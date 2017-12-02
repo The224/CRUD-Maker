@@ -75,6 +75,11 @@ public class Satellite {
         return true;
     }
 
+    public List<?> findAll() {
+        return fetchList;
+    }
+
+/* TODO : Faire fonctionner pour plusieur classType
     public Object findById(@NotNull Object id) {
         for (Object t : fetchList) {
             if (getIdValue(t).equals(id)) {
@@ -82,10 +87,6 @@ public class Satellite {
             }
         }
         return null;
-    }
-
-    public List<?> findAll() {
-        return fetchList;
     }
 
     public boolean remove(@NotNull Object id) {
@@ -109,20 +110,16 @@ public class Satellite {
         remove(id); // The lazy way !
         return insert(t);
     }
-
-    public Satellite fetchAllByClass(Class classType) throws NoEmptyConstructorException{
-        fetchList = (List<Object>) transferDataService.fetchAllByClass(classType);
+*/
+    public Satellite fetchAllByClass(Class... classes) throws NoEmptyConstructorException{
+        for (Class classe : classes) {
+            fetchList.addAll(transferDataService.fetchAllByClass(classe));
+        }
         return this;
     }
 
     public Satellite fetchAllByCondition(Class classType, String condition) {
         String sql = "select * from " + classType.getSimpleName() + " where " + condition + ";";
-        fetchList = (List<Object>) transferDataService.fetchEntitiesByQuery(classType, sql);
-        return this;
-    }
-
-    public Satellite fetchById(Class classType, int id){
-        String sql = "select * from " + classType.getSimpleName() + " where id = " + id + ";";
         fetchList = (List<Object>) transferDataService.fetchEntitiesByQuery(classType, sql);
         return this;
     }

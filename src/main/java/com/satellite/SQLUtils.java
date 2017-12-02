@@ -5,6 +5,9 @@ package com.satellite;
  */
 public class SQLUtils {
 
+    public static final String SQL_INTEGER_TYPE = "INT";
+    public static final String SQL_STRING_TYPE = "VARCHAR";
+
     /**
      * @return insert into 'entity class name' values(
      */

@@ -12,22 +12,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class TransferDataService {
-
-    private static final String SQL_INTEGER_TYPE = "INT";
-    private static final String SQL_STRING_TYPE = "VARCHAR";
     private static final int AUCUN_ARGUMENT = 0;
 
     private Connection connection;
-
-    public TransferDataService() {
-    }
 
     public void push(List<?> pendingList) throws Exception {
         for (Object entity : pendingList) {
             // Verifier que la table existe dans la DB
             // Dans la boucle pour chaque type different
-            if (!entityTableExists(pendingList.get(0).getClass())) {
-                createSQLTableFromEntity(pendingList.get(0));
+            if (!entityTableExists(entity.getClass())) {
+                createSQLTableFromEntity(entity);
             }
             persistEntityValues(entity);
         }
@@ -69,10 +63,11 @@ public class TransferDataService {
             }
             sql.append(field.getName());
 
+            // BUG IF OTHER THEN INT OR STRING
             if (Integer.class == field.getType() || int.class == field.getType()) {
-                sql.append(" " + SQL_INTEGER_TYPE + ", ");
+                sql.append(" " + SQLUtils.SQL_INTEGER_TYPE + ", ");
             } else if (String.class == field.getType()) {
-                sql.append(" " + SQL_STRING_TYPE + "(40), ");
+                sql.append(" " + SQLUtils.SQL_STRING_TYPE + "(40), ");
             }
         }
         sql.append(SQLUtils.writePrimaryKey(idName));

@@ -64,7 +64,7 @@ public class SatelliteTest {
 
         assertThat(satellite.isConnected()).isFalse();
     }
-
+/*
     @Test
     public void testFindById() throws Exception {
         satellite.insert(user01);
@@ -93,7 +93,7 @@ public class SatelliteTest {
         assertThat(satellite.findById(65)).isNotNull();
         satellite.remove(65);
         assertThat(satellite.findById(65)).isNull();
-    }
+    }*/
 
     @Test
     public void update() throws Exception {

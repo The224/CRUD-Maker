@@ -25,21 +25,21 @@ public class Demo {
 
         satellite.connect("localhost", "3306", "testSatellite", "root", "toor");
         satellite.push();
-        List<User> users = (List<User>) satellite.fetchAllByClass(User.class).findAll();
 
-        List<User> user01 = (List<User>) satellite.fetchAllByCondition(User.class, "name = 'Karla'").findAll();
-        List<User> user02 = (List<User>) satellite.fetchById(User.class, 4).findAll();
+
+
+        List fetchData = satellite.fetchAllByClass(User.class).findAll();
+
+        List user01 = satellite.fetchAllByCondition(User.class, "name = 'Karla'").findAll();
 
         satellite.closeConnection();
 
 
-        for(User user : users){
-            System.out.println(user.toString());
+        for(Object user : fetchData){
+            System.out.println(user);
         }
         System.out.println(user01);
-        System.out.println(user02);
 
         //satellite.findById(1);
-
     }
 }
