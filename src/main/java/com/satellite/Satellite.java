@@ -6,6 +6,7 @@ import com.satellite.exception.NoConnectionOpenedException;
 import com.satellite.exception.NoEmptyConstructorException;
 import com.satellite.exception.NoIdAnnotationException;
 import com.sun.istack.internal.NotNull;
+import com.sun.org.apache.xerces.internal.xs.datatypes.ObjectList;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
@@ -28,10 +29,10 @@ public class Satellite {
     private ConnectionManager connectionManager;
 
     public Satellite() throws NoIdAnnotationException {
-        pendingList = new ArrayList();
-        fetchList = new ArrayList();
+        pendingList = new ArrayList<Object>();
+        fetchList = new ArrayList<Object>();
         connectionManager = new ConnectionManager();
-        transferDataService = new TransferDataService(connectionManager.getConnection());
+        transferDataService = new TransferDataService();
     }
 
     public static Satellite getInstance() throws Exception{
@@ -39,6 +40,23 @@ public class Satellite {
             satellite = new Satellite();
         }
         return satellite;
+    }
+
+    public Boolean connect(String hostName, String port, String database, String user, String password) throws ConnectionFailedException {
+        String url = "jdbc:mysql://" + hostName + ":" + port + "/" + database;
+        if (null == connectionManager.connect(url, user, password)) {
+            throw new ConnectionFailedException();
+        }
+        transferDataService.setConnection(connectionManager.getConnection());
+        return true;
+    }
+
+    public Boolean isConnected(){
+        return null != connectionManager.getConnection();
+    }
+
+    public void closeConnection() throws SQLException {
+        connectionManager.close();
     }
 
     public boolean insert(Object obj) {
@@ -57,22 +75,6 @@ public class Satellite {
         return true;
     }
 
-    public Boolean connect(String hostName, String port, String database, String user, String password) throws ConnectionFailedException {
-        String url = "jdbc:mysql://" + hostName + ":" + port + "/" + database;
-        if (null == connectionManager.connect(url, user, password)) {
-            throw new ConnectionFailedException();
-        }
-        return true;
-    }
-
-    public Boolean isConnected(){
-        return null != connectionManager.getConnection();
-    }
-
-    public void closeConnection() throws SQLException {
-        connectionManager.close();
-    }
-
     public Object findById(@NotNull Object id) {
         for (Object t : fetchList) {
             if (getIdValue(t).equals(id)) {
@@ -80,10 +82,6 @@ public class Satellite {
             }
         }
         return null;
-    }
-
-    public List<?> getPendingList() {
-        return pendingList;
     }
 
     public List<?> findAll() {
@@ -129,10 +127,6 @@ public class Satellite {
         return this;
     }
 
-    public Satellite fetchByQuery(){
-        return null;
-    }
-
     /**
      * Envoie les modifications de pendingList dans fetchList et la BD
      */
@@ -146,7 +140,7 @@ public class Satellite {
         }
 
         fetchList.addAll(pendingList);
-        pendingList = new ArrayList();
+        pendingList = new ArrayList<Object>();
     }
 
     private Object getIdValue(Object t) {
@@ -165,5 +159,9 @@ public class Satellite {
             e.printStackTrace();
         }
         return null;
+    }
+
+    public List<?> getPendingList() {
+        return pendingList;
     }
 }

@@ -17,10 +17,9 @@ public class TransferDataService {
     private static final String SQL_STRING_TYPE = "VARCHAR";
     private static final int AUCUN_ARGUMENT = 0;
 
-    private static Connection connection;
+    private Connection connection;
 
-    public TransferDataService(Connection connection) {
-        this.connection = connection;
+    public TransferDataService() {
     }
 
     public void push(List<?> pendingList) throws Exception {
@@ -175,5 +174,14 @@ public class TransferDataService {
 
     private boolean isMethodNameIsEqualToFieldName(Method method, Field field) {
         return method.getName().substring(3).toLowerCase().equals(field.getName().toLowerCase());
+    }
+
+
+    public Connection getConnection() {
+        return connection;
+    }
+
+    public void setConnection(Connection connection) {
+        this.connection = connection;
     }
 }
