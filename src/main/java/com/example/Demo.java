@@ -5,6 +5,9 @@ import com.satellite.Satellite;
 import java.util.List;
 
 public class Demo {
+
+    private static final int ID_DEMO = 0;
+
     public static void main(String... args) throws Exception{
         Satellite satellite = null;
 
@@ -14,10 +17,10 @@ public class Demo {
             e.printStackTrace();
         }
 
-        satellite.insert(new User(13,"Gabriel", 90));
-        satellite.insert(new User(14,"Karla", 34));
-        satellite.insert(new User(15,"Tyrion", 56));
-        satellite.insert(new User(16,"Alec", 78));
+        satellite.insert(new User(ID_DEMO*4+1,"Gabriel", 90*ID_DEMO));
+        satellite.insert(new User(ID_DEMO*4+2,"Karla", 34*ID_DEMO));
+        satellite.insert(new User(ID_DEMO*4+3,"Tyrion", 56*ID_DEMO));
+        satellite.insert(new User(ID_DEMO*4+4,"Alec", 78*ID_DEMO));
 
         satellite.insert(new Pays("Canada", 36048521, "A mari usque ad mare", "Ottawa"));
         satellite.insert(new Pays("France", 67595000, "Liberté, Égalité, Fraternité", "Paris"));
@@ -25,7 +28,6 @@ public class Demo {
 
         satellite.connect("localhost", "3306", "testSatellite", "root", "toor");
         satellite.push();
-
 
 
         List fetchData = satellite.fetchAllByClass(User.class).findAll();
@@ -40,6 +42,5 @@ public class Demo {
         }
         System.out.println(user01);
 
-        //satellite.findById(1);
     }
 }

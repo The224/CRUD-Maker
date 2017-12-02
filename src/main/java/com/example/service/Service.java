@@ -2,6 +2,7 @@ package com.example.service;
 
 import com.satellite.Satellite;
 
-public class Service {
+public abstract class Service {
     protected Satellite satellite;
+
 }

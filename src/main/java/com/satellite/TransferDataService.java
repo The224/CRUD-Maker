@@ -45,6 +45,9 @@ public class TransferDataService {
 
 
     private Boolean entityTableExists(Class entityClass) throws SQLException {
+        /* TODO : REMOVE AFTER */
+        //dropTable(entityClass);
+
         DatabaseMetaData metaData = connection.getMetaData();
         ResultSet tables = metaData.getTables(null, null, entityClass.getSimpleName(), null);
         return tables.next();
@@ -74,6 +77,13 @@ public class TransferDataService {
         executeSQLUpdate(sql.toString());
     }
 
+    private void dropTable(Class entity) {
+        try {
+            getResultSetQuery("DROP TABLE"+entity.getSimpleName()+";");
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
 
     private void executeSQLUpdate(String sql) {
         try {
