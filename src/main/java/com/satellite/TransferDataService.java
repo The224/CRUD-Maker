@@ -41,8 +41,6 @@ public class TransferDataService {
         executeSQLUpdate(sql.toString());
     }
 
-
-
     private Boolean entityTableExists(Class entityClass) throws SQLException {
 
         DatabaseMetaData metaData = connection.getMetaData();
@@ -111,6 +109,24 @@ public class TransferDataService {
                 orderedList.add(field);
             }
         }
+    }
+
+    public List<?> fetchAllDatabase(String url){
+
+        List listAllEntities = new ArrayList();
+
+        try {
+            DatabaseMetaData metaData = connection.getMetaData();
+            ResultSet tables = metaData.getTables(null, null, "%", null);
+            while (tables.next()) {
+                String tableName = tables.getString("TABLE_NAME");
+                Class classValue = Class.forName(url + "." + tableName.substring(0, 1).toUpperCase() + tableName.substring(1).toLowerCase());
+                listAllEntities.addAll(fetchAllByClass(classValue));
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return listAllEntities;
     }
 
     public List<?> fetchAllByClass(Class classType){

@@ -112,12 +112,13 @@ public class Satellite {
     }
 */
 
-    public Satellite fetchAll(){
-
+    public Satellite fetchAllByDatabase(String classesPathUrl){
+        fetchList = (List<Object>) transferDataService.fetchAllDatabase(classesPathUrl);
         return this;
     }
 
     public Satellite fetchAllByClass(Class... classes) throws NoEmptyConstructorException{
+        fetchList = new ArrayList();
         for (Class classe : classes) {
             fetchList.addAll(transferDataService.fetchAllByClass(classe));
         }
@@ -134,9 +135,8 @@ public class Satellite {
      * Envoie les modifications de pendingList dans fetchList et la BD
      */
     public void push() throws Exception {
-        Connection connection = connectionManager.getConnection();
 
-        if (null != connection) {
+        if (isConnected()) {
             transferDataService.push(pendingList);
         } else {
             throw new NoConnectionOpenedException();
