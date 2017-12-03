@@ -13,6 +13,9 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Class to manage classes entities and perform various database-related operations
+ */
 public class Satellite {
     // Liste de la BD
     private List<Object> fetchList;

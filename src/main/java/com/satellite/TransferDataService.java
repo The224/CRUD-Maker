@@ -11,6 +11,9 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Class to transfer data between the satellite and the database
+ */
 public class TransferDataService {
     private static final int AUCUN_ARGUMENT = 0;
     private Connection connection;
@@ -313,13 +316,5 @@ public class TransferDataService {
      */
     private boolean isMethodNameIsEqualToFieldName(Method method, Field field) {
         return method.getName().substring(3).toLowerCase().equals(field.getName().toLowerCase());
-    }
-
-    public Connection getConnection() {
-        return connection;
-    }
-
-    public void setConnection(Connection connection) {
-        this.connection = connection;
     }
 }
