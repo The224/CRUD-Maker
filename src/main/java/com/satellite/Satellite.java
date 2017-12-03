@@ -6,11 +6,9 @@ import com.satellite.exception.NoConnectionOpenedException;
 import com.satellite.exception.NoEmptyConstructorException;
 import com.satellite.exception.NoIdAnnotationException;
 import com.sun.istack.internal.NotNull;
-import com.sun.org.apache.xerces.internal.xs.datatypes.ObjectList;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
-import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
@@ -35,12 +33,15 @@ public class Satellite {
         transferDataService = new TransferDataService();
     }
 
+    //singleton
     public static Satellite getInstance() throws Exception{
         if(null == satellite){
             satellite = new Satellite();
         }
         return satellite;
     }
+
+    /* CONNECTION METHODS */
 
     public Boolean connect(String hostName, String port, String database, String user, String password) throws ConnectionFailedException {
         String url = "jdbc:mysql://" + hostName + ":" + port + "/" + database;
@@ -59,36 +60,57 @@ public class Satellite {
         connectionManager.close();
     }
 
-    public boolean insert(Object obj) {
-        for (Object t : fetchList)
-            if (getIdValue(t).equals(getIdValue(obj))) {
-                System.out.println("fetchList : Un objet avec le meme id existe deja !");
-                return false;
-            }
+    /*  PENDING LIST METHODS */
 
-        for (Object t : pendingList)
-            if (getIdValue(t).equals(getIdValue(obj))) {
-                System.out.println("pendingList : Un objet avec le meme id existe deja !");
-                return false;
-            }
+    public List<?> getPendingList() {
+        return pendingList;
+    }
+
+    public boolean insert(Object obj) {
+        if (listContainsDuplicateId(obj, pendingList) || listContainsDuplicateId(obj, fetchList)){
+            return false;
+        }
         pendingList.add(obj);
         return true;
     }
+
+    private boolean listContainsDuplicateId(Object obj, List list) {
+        for (Object entity : list)
+            if (getIdValue(entity).equals(getIdValue(obj))) {
+                System.out.println("pendingList : Un objet avec le meme id existe deja !");
+                return true;
+            }
+        return false;
+    }
+
+    /* FIND METHODS -- SELECT FROM FETCHLIST */
 
     public List<?> findAll() {
         return fetchList;
     }
 
-/* TODO : Faire fonctionner pour plusieur classType
-    public Object findById(@NotNull Object id) {
-        for (Object t : fetchList) {
-            if (getIdValue(t).equals(id)) {
-                return t;
+    public List findById(@NotNull Object id) {
+        List entitiesList = new ArrayList();
+
+        for (Object entity : fetchList) {
+            if (getIdValue(entity).equals(id)) {
+                entitiesList.add(entity);
+            }
+        }
+        return entitiesList;
+    }
+
+    public Object findById(@NotNull Object id, Class classtype) {
+
+        for (Object entity : fetchList) {
+            if (getIdValue(entity).equals(id) && classtype == entity.getClass()) {
+                return entity;
             }
         }
         return null;
     }
 
+/*
     public boolean remove(@NotNull Object id) {
         for (Object t : fetchList) {
             if (getIdValue(t).equals(id)) {
@@ -112,7 +134,9 @@ public class Satellite {
     }
 */
 
-    public Satellite fetchAllByDatabase(String classesPathUrl){
+    /* FETCH METHODS -- GET FROM DATABASE TO FETCHLIST */
+
+    public Satellite fetchAllDatabase(String classesPathUrl){
         fetchList = (List<Object>) transferDataService.fetchAllDatabase(classesPathUrl);
         return this;
     }
@@ -162,9 +186,5 @@ public class Satellite {
             e.printStackTrace();
         }
         return null;
-    }
-
-    public List<?> getPendingList() {
-        return pendingList;
     }
 }

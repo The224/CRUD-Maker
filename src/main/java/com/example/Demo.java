@@ -32,7 +32,7 @@ public class Demo {
         /*
         satellite.push();
         */
-        List<Object> databaseList = (List<Object>) satellite.fetchAllByDatabase("com.example").findAll();
+        List<Object> databaseList = (List<Object>) satellite.fetchAllDatabase("com.example").findAll();
 
         
         List fetchData = satellite.fetchAllByClass(User.class).findAll();
