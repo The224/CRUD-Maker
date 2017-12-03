@@ -18,6 +18,10 @@ public class TransferDataService {
     private static final int AUCUN_ARGUMENT = 0;
     private Connection connection;
 
+    public void setConnection(Connection connection) {
+        this.connection = connection;
+;   }
+
     /**
      *
      * Send all new entities, modifications and removals to the database
@@ -151,7 +155,6 @@ public class TransferDataService {
      * @param sql
      */
     private void executeSQLUpdate(String sql) {
-        System.out.println(sql);
         try {
             Statement statement = connection.createStatement();
             int result = statement.executeUpdate(sql);

@@ -33,7 +33,7 @@ public class Satellite {
 
     private ConnectionManager connectionManager;
 
-    private Satellite() throws NoIdAnnotationException {
+    private Satellite(){
         pendingList = new ArrayList<Object>();
         fetchList = new ArrayList<Object>();
         removeList = new ArrayList<Object>();
@@ -46,9 +46,8 @@ public class Satellite {
      * Get the instance of Satellite
      *
      * @return satellite an instance of the Satellite class
-     * @throws NoIdAnnotationException
      */
-    public static Satellite getInstance() throws NoIdAnnotationException {
+    public static Satellite getInstance() {
         if(null == satellite){
             satellite = new Satellite();
         }
@@ -74,7 +73,7 @@ public class Satellite {
             throw new ConnectionFailedException();
         }
         transferDataService.setConnection(connectionManager.getConnection());
-        return true;
+        return isConnected();
     }
 
     /**
@@ -131,7 +130,6 @@ public class Satellite {
      * @return true if the object could be removed successfully from the fetch, false otherwise
      */
     public boolean remove(@NotNull Object obj) {
-
         Object id = getIdValue(obj);
         return removeById(obj.getClass(), id);
     }
