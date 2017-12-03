@@ -111,6 +111,12 @@ public class Satellite {
         return insert(t);
     }
 */
+
+    public Satellite fetchAll(){
+
+        return this;
+    }
+
     public Satellite fetchAllByClass(Class... classes) throws NoEmptyConstructorException{
         for (Class classe : classes) {
             fetchList.addAll(transferDataService.fetchAllByClass(classe));

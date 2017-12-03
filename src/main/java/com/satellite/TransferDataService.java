@@ -33,7 +33,6 @@ public class TransferDataService {
 
         for (Field field : fieldsList) {
             field.setAccessible(true);
-            // TODO : A voir !!!!
             String fieldValue = (String.class == field.getType()) ? "'" + field.get(entity).toString() + "'" : field.get(entity).toString();
 
             // Detecte le dernier element
@@ -45,8 +44,6 @@ public class TransferDataService {
 
 
     private Boolean entityTableExists(Class entityClass) throws SQLException {
-        /* TODO : REMOVE AFTER */
-        //dropTable(entityClass);
 
         DatabaseMetaData metaData = connection.getMetaData();
         ResultSet tables = metaData.getTables(null, null, entityClass.getSimpleName(), null);
@@ -78,11 +75,7 @@ public class TransferDataService {
     }
 
     private void dropTable(Class entity) {
-        try {
-            getResultSetQuery("DROP TABLE"+entity.getSimpleName()+";");
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+        executeSQLUpdate("DROP TABLE" + entity.getSimpleName() + ";");
     }
 
     private void executeSQLUpdate(String sql) {

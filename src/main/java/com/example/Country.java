@@ -2,20 +2,20 @@ package com.example;
 
 import com.satellite.annotation.Id;
 
-public class Pays {
+public class Country {
 
     @Id
     private String name;
     private int population;
-    private String devise;
+    private String motto;
     private String capital;
 
-    public Pays() {}
+    public Country() {}
 
-    public Pays(String name, int population, String devise, String capital) {
+    public Country(String name, int population, String motto, String capital) {
         this.name = name;
         this.population = population;
-        this.devise = devise;
+        this.motto = motto;
         this.capital = capital;
     }
 
@@ -35,12 +35,12 @@ public class Pays {
         this.population = population;
     }
 
-    public String getDevise() {
-        return devise;
+    public String getMotto() {
+        return motto;
     }
 
-    public void setDevise(String devise) {
-        this.devise = devise;
+    public void setMotto(String motto) {
+        this.motto = motto;
     }
 
     public String getCapital() {
@@ -53,10 +53,10 @@ public class Pays {
 
     @Override
     public String toString() {
-        return "Pays{" +
+        return "Country{" +
                 "name='" + name + '\'' +
                 ", population=" + population +
-                ", devise='" + devise + '\'' +
+                ", motto='" + motto + '\'' +
                 ", capital='" + capital + '\'' +
                 '}';
     }

@@ -22,9 +22,9 @@ public class Demo {
         satellite.insert(new User(ID_DEMO*4+3,"Tyrion", 56*ID_DEMO));
         satellite.insert(new User(ID_DEMO*4+4,"Alec", 78*ID_DEMO));
 
-        satellite.insert(new Pays("Canada", 36048521, "A mari usque ad mare", "Ottawa"));
-        satellite.insert(new Pays("France", 67595000, "Liberté, Égalité, Fraternité", "Paris"));
-        satellite.insert(new Pays("Angleterre", 55012456, "Dieu et mon droit", "Londres"));
+        satellite.insert(new Country("Canada", 36048521, "A mari usque ad mare", "Ottawa"));
+        satellite.insert(new Country("France", 67595000, "Liberté, Égalité, Fraternité", "Paris"));
+        satellite.insert(new Country("Angleterre", 55012456, "Dieu et mon droit", "London"));
 
         satellite.connect("localhost", "3306", "testSatellite", "root", "toor");
         satellite.push();
