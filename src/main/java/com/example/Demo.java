@@ -33,7 +33,7 @@ public class Demo {
 
         satellite.push();*/
 
-        List multipleObjectsWithIds = satellite.fetchAllDatabase("com.example").findById(2);
+        /*List multipleObjectsWithIds = satellite.fetchAllDatabase("com.example").findById(2);
         List userData = satellite.fetchAllByClass(User.class).findAll();
         List userDataWithName = satellite.fetchAllByCondition(User.class, "name = 'Karla'").findAll();
 
@@ -50,6 +50,13 @@ public class Demo {
         System.out.println(databaseData2);
         System.out.println(multipleObjectsWithIds);
         System.out.println(userData);
-        System.out.println(userDataWithName);
+        System.out.println(userDataWithName);*/
+
+        List<Pants> list = (List<Pants>) satellite.fetchAllByClass(Pants.class).findAll();
+
+        satellite.update(list.get(0), "color", "orange");
+        satellite.push();
+        List<Pants> pantsWithUpdate = (List<Pants>) satellite.fetchAllByClass().findAll();
+        System.out.println(pantsWithUpdate);
     }
 }

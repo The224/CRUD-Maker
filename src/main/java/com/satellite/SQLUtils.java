@@ -1,5 +1,7 @@
 package com.satellite;
 
+import org.jetbrains.annotations.NotNull;
+
 /**
  * Cette classe permettra dans le futur l'implementation d'une panoplis de SGBDR et SGBD NoSQL
  */
@@ -23,10 +25,18 @@ public class SQLUtils {
     }
 
     /**
-     * @return PRIMARY KEY ('idName'));
+     * @return primary key ('idName'));
      */
     public static String writePrimaryKey(String idName) {
-        return "PRIMARY KEY(" + idName + "));";
+        return "primary key(" + idName + "));";
     }
 
+    /**
+     *
+     * @return update <tablename> set <column1>, <column2>, etc.
+     */
+    @NotNull
+    static String writeUpdate(Object entity) {
+        return "update " + entity.getClass().getSimpleName() + " set ";
+    }
 }

@@ -23,7 +23,7 @@ public class TransferDataService {
      * @param removeList
      * @throws Exception
      */
-    public void push(List<?> pendingList, List<?> removeList) throws Exception {
+    public void push(List<?> pendingList, List<?> removeList, List<?> updateList) throws Exception {
         for (Object entity : pendingList) {
             // Verifier que la table existe dans la DB
             // Dans la boucle pour chaque type different
@@ -35,6 +35,9 @@ public class TransferDataService {
         for(Object entity : removeList){
             deleteEntity(entity);
         }
+        for(Object entity : updateList){
+            update(entity);
+        }
     }
 
     /**
@@ -45,6 +48,27 @@ public class TransferDataService {
     private void deleteEntity(Object entity){
         String sql = "DELETE FROM " + entity.getClass().getSimpleName() + " WHERE id = " + Satellite.getIdValue(entity) + ";";
         executeSQLUpdate(sql);
+    }
+
+    /**
+     * Update the row corresponding to the entity in the database
+     *
+     * @param entity
+     * @throws IllegalAccessException
+     */
+    public void update(Object entity) throws IllegalAccessException {
+        List<Field> fieldsList = getOrderedFieldsList(entity);
+
+        StringBuilder sql = new StringBuilder(SQLUtils.writeUpdate(entity));
+
+        for (Field field : fieldsList) {
+            field.setAccessible(true);
+            String fieldValue = (String.class == field.getType()) ? "'" + field.get(entity).toString() + "'" : " " + field.get(entity).toString();
+            sql.append(field.getName() + " = ");
+            sql.append((fieldsList.size() - 1 != fieldsList.indexOf(field)) ? fieldValue + ", " : fieldValue);
+        }
+        sql.append(" WHERE id = " + Satellite.getIdValue(entity));
+        executeSQLUpdate(sql.toString());
     }
 
     /**
@@ -124,6 +148,7 @@ public class TransferDataService {
      * @param sql
      */
     private void executeSQLUpdate(String sql) {
+        System.out.println(sql);
         try {
             Statement statement = connection.createStatement();
             int result = statement.executeUpdate(sql);

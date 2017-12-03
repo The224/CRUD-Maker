@@ -20,6 +20,8 @@ public class Satellite {
     private List<Object> pendingList;
     // Liste des éléments supprimés du fetch
     private List<Object> removeList;
+    // Liste des éléments mis à jour du fetch
+    private List<Object> updateList;
     // Class du generic
     //private Class beanClass;
     private static Satellite satellite;
@@ -32,6 +34,7 @@ public class Satellite {
         pendingList = new ArrayList<Object>();
         fetchList = new ArrayList<Object>();
         removeList = new ArrayList<Object>();
+        updateList = new ArrayList<Object>();
         connectionManager = new ConnectionManager();
         transferDataService = new TransferDataService();
     }
@@ -157,15 +160,40 @@ public class Satellite {
     }
 
     /**
+     * Update an entity from satellite's latest fetch
      *
-     *
-     * @param id
-     * @param t
-     * @return
+     * @param object
+     * @param fieldName the name of the field we want to update
+     * @param newValue the new value of the field we want to update
+     * @return true if the satellite could find and update the entity, false otherwise
      */
-    public boolean update(@NotNull Object id, Object t) {
-        remove(id); // The lazy way !
-        return insert(t);
+    public boolean update(@NotNull Object object, String fieldName, Object newValue) {
+
+        boolean flag = false;
+
+        for(Object entity: fetchList){
+
+            if(getIdValue(object).equals(getIdValue(entity)) && object.getClass() == entity.getClass()){
+                Field[] fields = object.getClass().getDeclaredFields();
+
+                for(Field field : fields){
+                    if(fieldName.equals(field.getName())){
+                        field.setAccessible(true);
+                        try {
+                            field.set(entity, newValue);
+                        } catch (IllegalAccessException e) {
+                            e.printStackTrace();
+                        }
+                        break;
+                    }
+                }
+                updateList.add(object);
+                fetchList.remove(object);
+                flag = true;
+                break;
+            }
+        }
+        return flag;
     }
 
     /* FIND METHODS -- SELECT FROM FETCH LIST */
@@ -265,7 +293,7 @@ public class Satellite {
 
         if (isConnected()) {
             // gère les nouveaux éléments et les éléments supprimés
-            transferDataService.push(pendingList, removeList);
+            transferDataService.push(pendingList, removeList, updateList);
         } else {
             throw new NoConnectionOpenedException();
         }
