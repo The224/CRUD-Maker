@@ -42,7 +42,6 @@ public class TransferDataService {
     }
 
     private Boolean entityTableExists(Class entityClass) throws SQLException {
-
         DatabaseMetaData metaData = connection.getMetaData();
         ResultSet tables = metaData.getTables(null, null, entityClass.getSimpleName(), null);
         return tables.next();
