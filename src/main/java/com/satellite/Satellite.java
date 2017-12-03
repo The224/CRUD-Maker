@@ -76,7 +76,7 @@ public class Satellite {
 
     private boolean listContainsDuplicateId(Object obj, List list) {
         for (Object entity : list)
-            if (getIdValue(entity).equals(getIdValue(obj))) {
+            if (getIdValue(entity).equals(getIdValue(obj)) && entity.getClass() == obj.getClass()) {
                 System.out.println("pendingList : Un objet avec le meme id existe deja !");
                 return true;
             }
