@@ -31,16 +31,15 @@ public class Demo {
         satellite.insert(new Country("France", 67595000, "Liberté, Égalité, Fraternité", "Paris"));
         satellite.insert(new Country("Angleterre", 55012456, "Dieu et mon droit", "London"));
 
-        satellite.connect("localhost", "3306", "testSatellite", "root", "toor");
-
         satellite.push();*/
 
-        List databaseData = satellite.fetchAllDatabase("com.example").findAll();
         List multipleObjectsWithIds = satellite.fetchAllDatabase("com.example").findById(2);
         List userData = satellite.fetchAllByClass(User.class).findAll();
         List userDataWithName = satellite.fetchAllByCondition(User.class, "name = 'Karla'").findAll();
 
+        List databaseData = satellite.fetchAllDatabase("com.example").findAll();
         satellite.remove(userData.get(1));
+        satellite.removeById(User.class, 4);
         satellite.push();
 
         List databaseData2 = satellite.fetchAllDatabase("com.example").findAll();

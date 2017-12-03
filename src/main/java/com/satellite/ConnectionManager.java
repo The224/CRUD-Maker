@@ -12,6 +12,14 @@ public class ConnectionManager {
         return connection;
     }
 
+    /**
+     * Connect to the database via JDBC
+     *
+     * @param url
+     * @param user
+     * @param password
+     * @return the connection
+     */
     public Connection connect(String url, String user, String password) {
 
         connection = null;
@@ -26,6 +34,11 @@ public class ConnectionManager {
         return connection;
     }
 
+    /**
+     * Close the connection to the database via JDBC
+     *
+     * @throws SQLException
+     */
     public void close() throws SQLException{
         if(null != connection){
             connection.close();

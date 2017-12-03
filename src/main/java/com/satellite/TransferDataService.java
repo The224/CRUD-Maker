@@ -13,9 +13,16 @@ import java.util.List;
 
 public class TransferDataService {
     private static final int AUCUN_ARGUMENT = 0;
-
     private Connection connection;
 
+    /**
+     *
+     * Send all new entities, modifications and removals to the database
+     *
+     * @param pendingList
+     * @param removeList
+     * @throws Exception
+     */
     public void push(List<?> pendingList, List<?> removeList) throws Exception {
         for (Object entity : pendingList) {
             // Verifier que la table existe dans la DB
@@ -30,11 +37,22 @@ public class TransferDataService {
         }
     }
 
+    /**
+     * Delete an entity from the database by its id
+     *
+     * @param entity
+     */
     private void deleteEntity(Object entity){
         String sql = "DELETE FROM " + entity.getClass().getSimpleName() + " WHERE id = " + Satellite.getIdValue(entity) + ";";
         executeSQLUpdate(sql);
     }
 
+    /**
+     * Insert all the entity values in the database
+     *
+     * @param entity
+     * @throws IllegalAccessException
+     */
     private void persistEntityValues(Object entity) throws IllegalAccessException {
         List<Field> fieldsList = getOrderedFieldsList(entity);
         StringBuilder sql = new StringBuilder(SQLUtils.writeInsertInto(entity));
@@ -49,12 +67,24 @@ public class TransferDataService {
         executeSQLUpdate(sql.toString());
     }
 
+    /**
+     * Checks if the table corresponding to a particular class exists already
+     *
+     * @param entityClass
+     * @return
+     * @throws SQLException
+     */
     private Boolean entityTableExists(Class entityClass) throws SQLException {
         DatabaseMetaData metaData = connection.getMetaData();
         ResultSet tables = metaData.getTables(null, null, entityClass.getSimpleName(), null);
         return tables.next();
     }
 
+    /**
+     * Create an entity class table in the database
+     *
+     * @param entity
+     */
     private void createSQLTableFromEntity(Object entity){
 
         List<Field> fieldsList = getOrderedFieldsList(entity);
@@ -79,10 +109,20 @@ public class TransferDataService {
         executeSQLUpdate(sql.toString());
     }
 
+    /**
+     * Delete  an entity class table from the database
+     *
+     * @param entity
+     */
     private void dropTable(Class entity) {
         executeSQLUpdate("DROP TABLE" + entity.getSimpleName() + ";");
     }
 
+    /**
+     * Execute an update into the database
+     *
+     * @param sql
+     */
     private void executeSQLUpdate(String sql) {
         try {
             Statement statement = connection.createStatement();
@@ -92,6 +132,12 @@ public class TransferDataService {
         }
     }
 
+    /**
+     * List all the fields of an entity in order (beginnning by its id)
+     *
+     * @param entity
+     * @return the ordered fields list
+     */
     private List<Field> getOrderedFieldsList(Object entity) {
 
         Field[] fields = entity.getClass().getDeclaredFields();
@@ -103,6 +149,12 @@ public class TransferDataService {
         return orderedList;
     }
 
+    /**
+     * Add to the list in order whether the field is an id or not
+     *
+     * @param orderedList
+     * @param field
+     */
     private void addToFieldsListInOrder(List<Field> orderedList, Field field) {
         Annotation[] annotations = field.getDeclaredAnnotations();
 
@@ -118,6 +170,12 @@ public class TransferDataService {
         }
     }
 
+    /**
+     * Fetch all entities from the database and build them
+     *
+     * @param url
+     * @return the list of entities
+     */
     public List<?> fetchAllDatabase(String url){
 
         List listAllEntities = new ArrayList();
@@ -136,11 +194,24 @@ public class TransferDataService {
         return listAllEntities;
     }
 
+    /**
+     * Fetch all the entities of a particular class in the database
+     *
+     * @param classType
+     * @return the list of entities
+     */
     public List<?> fetchAllByClass(Class classType){
         String sql = "SELECT * FROM " + classType.getSimpleName();
         return fetchEntitiesByQuery(classType, sql);
     }
 
+    /**
+     * Fetch all the entities that are the results of a particular sql query
+     *
+     * @param classType
+     * @param sql the query
+     * @return the list of results
+     */
     public List<?> fetchEntitiesByQuery(Class classType, String sql) {
         Field[] fields = classType.getDeclaredFields();
         Method[] methods = classType.getDeclaredMethods();
@@ -172,8 +243,10 @@ public class TransferDataService {
     }
 
     /**
+     * Get the empty constructor of a particular class
+     *
      * @param classType
-     * @return Le constructor sans paramettre
+     * @return the empty constructor
      * @throws NoEmptyConstructorException
      */
     private Constructor getEmptyConstructor(Class classType) throws NoEmptyConstructorException {
@@ -184,19 +257,38 @@ public class TransferDataService {
         throw new NoEmptyConstructorException();
     }
 
+    /**
+     * Get the results of an sql query
+     *
+     * @param sql the query
+     * @return the results in the form of a resultset
+     * @throws SQLException
+     */
     private ResultSet getResultSetQuery(String sql) throws SQLException {
         Statement statement = connection.createStatement();
         return statement.executeQuery(sql);
     }
 
+    /**
+     * Checks if a method is a setter or not
+     *
+     * @param method
+     * @return true if the method is a setter
+     */
     private boolean isSetterMethod(Method method) {
         return "set".equals(method.getName().substring(0, 3).toLowerCase());
     }
 
+    /**
+     * Checks if the setter method name corresponds to a field name
+     *
+     * @param method
+     * @param field
+     * @return true if the names correspond, false otherwise
+     */
     private boolean isMethodNameIsEqualToFieldName(Method method, Field field) {
         return method.getName().substring(3).toLowerCase().equals(field.getName().toLowerCase());
     }
-
 
     public Connection getConnection() {
         return connection;
