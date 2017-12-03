@@ -18,6 +18,8 @@ public class Satellite {
     private List<Object> fetchList;
     // Liste des modification qui ne sont pas dans la BD
     private List<Object> pendingList;
+    // Liste des éléments supprimés du fetch
+    private List<Object> removeList;
     // Class du generic
     //private Class beanClass;
     private static Satellite satellite;
@@ -29,6 +31,7 @@ public class Satellite {
     public Satellite() throws NoIdAnnotationException {
         pendingList = new ArrayList<Object>();
         fetchList = new ArrayList<Object>();
+        removeList = new ArrayList<Object>();
         connectionManager = new ConnectionManager();
         transferDataService = new TransferDataService();
     }
@@ -110,18 +113,18 @@ public class Satellite {
         return null;
     }
 
-/*
-    public boolean remove(@NotNull Object id) {
-        for (Object t : fetchList) {
-            if (getIdValue(t).equals(id)) {
-                fetchList.remove(t);
+    public boolean remove(@NotNull Object obj) {
+        for (Object entity : fetchList) {
+            if (getIdValue(entity) == getIdValue(obj)) {
+                removeList.add(entity);
+                fetchList.remove(entity);
                 return true;
             }
         }
-        // TODO : A voir !!!!
-        for (Object t : pendingList) {
-            if (getIdValue(t).equals(id)) {
-                pendingList.remove(t);
+
+        for (Object entity : pendingList) {
+            if (getIdValue(entity) == getIdValue(obj)) {
+                pendingList.remove(entity);
                 return true;
             }
         }
@@ -132,7 +135,7 @@ public class Satellite {
         remove(id); // The lazy way !
         return insert(t);
     }
-*/
+
 
     /* FETCH METHODS -- GET FROM DATABASE TO FETCHLIST */
 
@@ -161,7 +164,8 @@ public class Satellite {
     public void push() throws Exception {
 
         if (isConnected()) {
-            transferDataService.push(pendingList);
+            // gère les nouveaux éléments et les éléments supprimés
+            transferDataService.push(pendingList, removeList);
         } else {
             throw new NoConnectionOpenedException();
         }
@@ -170,7 +174,7 @@ public class Satellite {
         pendingList = new ArrayList<Object>();
     }
 
-    private Object getIdValue(Object t) {
+    public static Object getIdValue(Object t) {
 
         try {
             for (Field field : t.getClass().getDeclaredFields()) {

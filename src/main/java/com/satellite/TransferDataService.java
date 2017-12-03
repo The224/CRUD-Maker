@@ -16,7 +16,7 @@ public class TransferDataService {
 
     private Connection connection;
 
-    public void push(List<?> pendingList) throws Exception {
+    public void push(List<?> pendingList, List<?> removeList) throws Exception {
         for (Object entity : pendingList) {
             // Verifier que la table existe dans la DB
             // Dans la boucle pour chaque type different
@@ -25,6 +25,14 @@ public class TransferDataService {
             }
             persistEntityValues(entity);
         }
+        for(Object entity : removeList){
+            deleteEntity(entity);
+        }
+    }
+
+    private void deleteEntity(Object entity){
+        String sql = "DELETE FROM " + entity.getClass().getSimpleName() + " WHERE id = " + Satellite.getIdValue(entity) + ";";
+        executeSQLUpdate(sql);
     }
 
     private void persistEntityValues(Object entity) throws IllegalAccessException {

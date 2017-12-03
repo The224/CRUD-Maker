@@ -40,9 +40,15 @@ public class Demo {
         List userData = satellite.fetchAllByClass(User.class).findAll();
         List userDataWithName = satellite.fetchAllByCondition(User.class, "name = 'Karla'").findAll();
 
+        satellite.remove(userData.get(1));
+        satellite.push();
+
+        List databaseData2 = satellite.fetchAllDatabase("com.example").findAll();
+
         satellite.closeConnection();
 
         System.out.println(databaseData);
+        System.out.println(databaseData2);
         System.out.println(multipleObjectsWithIds);
         System.out.println(userData);
         System.out.println(userDataWithName);
