@@ -244,6 +244,7 @@ public class TransferDataService {
      * @return the list of results
      */
     public List<?> fetchEntitiesByQuery(Class classType, String sql) {
+
         Field[] fields = classType.getDeclaredFields();
         Method[] methods = classType.getDeclaredMethods();
 
@@ -259,6 +260,7 @@ public class TransferDataService {
                 for(Method method : methods){
                     if(isSetterMethod(method)){
                         for(Field field : fields){
+
                             if(isMethodNameIsEqualToFieldName(method, field)){
                                 method.invoke(t,  rs.getObject(field.getName()));
                             }

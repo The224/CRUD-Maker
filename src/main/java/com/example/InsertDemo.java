@@ -42,6 +42,7 @@ public class InsertDemo {
         List multipleObjectsWithIds = satellite.fetchAllDatabase("com.example").findById(2);
 
         //fetch everything in the class user and list every entity fetched
+
         List userData = satellite.fetchAllByClass(User.class).findAll();
 
         //fetch and list everything in the class user having Karla as its name
