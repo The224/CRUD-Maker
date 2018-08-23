@@ -1,5 +1,7 @@
 # Satellite
 
+It's like the `@Autowired` of [Spring Boot](http://spring.io/projects/spring-boot) who will automatically connect your class to a table inside your database. You will be able to edit those data with CRUD method.
+
 ## Roadmap
 * Create CRUD class
 * Create Useful annotations
